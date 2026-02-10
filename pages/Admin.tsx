@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   LogOut, Shield, MessageSquare, CreditCard, 
   Bell, UserCheck, ExternalLink, Calendar, CheckCircle2, 
-  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X
+  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X, RefreshCw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
@@ -27,6 +27,20 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   const [paymentModal, setPaymentModal] = useState<Referral | null>(null);
   const [paymentPix, setPaymentPix] = useState<PartnerPixData | null>(null);
   const [confirmingPayment, setConfirmingPayment] = useState(false);
+  const [approvalLoading, setApprovalLoading] = useState(false);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
+
+  const fetchPendingPartners = () => {
+    setApprovalLoading(true);
+    setApprovalError(null);
+    getPendingPartners()
+      .then((data) => setPendingPartners(data))
+      .catch((err) => {
+        setPendingPartners([]);
+        setApprovalError(err?.message ?? 'Erro ao carregar solicitações. Verifique a conexão e as credenciais do Firebase.');
+      })
+      .finally(() => setApprovalLoading(false));
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -39,9 +53,17 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   useEffect(() => {
     if (tab !== 'approval') return;
     let cancelled = false;
+    setApprovalLoading(true);
+    setApprovalError(null);
     getPendingPartners()
       .then((data) => { if (!cancelled) setPendingPartners(data); })
-      .catch(() => { if (!cancelled) setPendingPartners([]); });
+      .catch((err) => {
+        if (!cancelled) {
+          setPendingPartners([]);
+          setApprovalError(err?.message ?? 'Erro ao carregar solicitações.');
+        }
+      })
+      .finally(() => { if (!cancelled) setApprovalLoading(false); });
     return () => { cancelled = true; };
   }, [tab]);
 
@@ -213,7 +235,22 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
         <div className="flex-1 overflow-y-auto p-8">
           {tab === 'approval' && (
             <div className="space-y-8">
-              <p className="text-slate-600">Solicitações de parceiros aguardando liberação para utilizar o site completo.</p>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <p className="text-slate-600">Solicitações de parceiros aguardando liberação para utilizar o site completo.</p>
+                <button
+                  onClick={fetchPendingPartners}
+                  disabled={approvalLoading}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
+                >
+                  <RefreshCw size={16} className={approvalLoading ? 'animate-spin' : ''} />
+                  Atualizar
+                </button>
+              </div>
+              {approvalError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                  {approvalError}
+                </div>
+              )}
               <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest">
@@ -266,10 +303,17 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
                         </td>
                       </tr>
                     ))}
-                    {pendingPartners.length === 0 && (
+                    {pendingPartners.length === 0 && !approvalLoading && (
                       <tr>
                         <td colSpan={5} className="px-8 py-16 text-center text-slate-400">
                           Nenhuma solicitação pendente.
+                        </td>
+                      </tr>
+                    )}
+                    {pendingPartners.length === 0 && approvalLoading && (
+                      <tr>
+                        <td colSpan={5} className="px-8 py-16 text-center text-slate-400">
+                          Carregando...
                         </td>
                       </tr>
                     )}

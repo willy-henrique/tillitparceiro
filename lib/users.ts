@@ -6,7 +6,6 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -82,14 +81,16 @@ export async function createPartnerRequest(data: {
 
 export async function getPendingPartners(): Promise<PartnerRequest[]> {
   const col = collection(db, COLLECTION);
-  const q = query(
-    col,
-    where('status', '==', 'PENDING_APPROVAL'),
-    where('role', '==', 'PARTNER'),
-    orderBy('createdAt', 'desc')
-  );
+  const q = query(col, where('status', '==', 'PENDING_APPROVAL'));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => {
+  return snap.docs
+    .filter((d) => d.data().role === 'PARTNER')
+    .sort((a, b) => {
+      const aTime = a.data().createdAt?.toMillis?.() ?? 0;
+      const bTime = b.data().createdAt?.toMillis?.() ?? 0;
+      return bTime - aTime;
+    })
+    .map((d) => {
     const data = d.data();
     const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : '';
     const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : '';
