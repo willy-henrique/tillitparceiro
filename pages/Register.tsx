@@ -16,6 +16,7 @@ const Register: React.FC<RegisterProps> = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
+    companyName: '',
     name: '',
     email: '',
     phone: '',
@@ -108,6 +109,7 @@ const Register: React.FC<RegisterProps> = () => {
     setError('');
     try {
       await createPartnerRequest({
+        companyName: formData.companyName,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -255,6 +257,16 @@ const Register: React.FC<RegisterProps> = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome da Empresa</label>
+                <input 
+                  type="text"
+                  value={formData.companyName}
+                  onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                  placeholder="Nome fantasia ou razão social"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
+                />
+              </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome Completo</label>
                 <input 

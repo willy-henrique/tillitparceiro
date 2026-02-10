@@ -15,6 +15,7 @@ export interface PartnerRequest {
   name: string;
   email: string;
   phone: string;
+  companyName?: string;
   status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
   role: 'PARTNER';
   createdAt: string;
@@ -56,12 +57,14 @@ export async function createPartnerRequest(data: {
   name: string;
   email: string;
   phone: string;
+  companyName?: string;
 }): Promise<PartnerRequest> {
   const col = collection(db, COLLECTION);
   const docData = {
     name: data.name,
     email: data.email.toLowerCase().trim(),
     phone: data.phone,
+    companyName: data.companyName?.trim() ?? '',
     status: 'PENDING_APPROVAL',
     role: 'PARTNER',
     createdAt: Timestamp.now(),
@@ -99,6 +102,7 @@ export async function getPendingPartners(): Promise<PartnerRequest[]> {
       name: String(data.name ?? ''),
       email: String(data.email ?? ''),
       phone: String(data.phone ?? ''),
+      companyName: String(data.companyName ?? ''),
       status: (data.status as PartnerRequest['status']) ?? 'PENDING_APPROVAL',
       role: 'PARTNER' as const,
       createdAt,
@@ -146,6 +150,7 @@ export async function getUserByEmail(email: string): Promise<PartnerRequest | nu
     name: String(data.name ?? ''),
     email: String(data.email ?? ''),
     phone: String(data.phone ?? ''),
+    companyName: String(data.companyName ?? ''),
     status: (data.status as PartnerRequest['status']) ?? 'PENDING_APPROVAL',
     role: 'PARTNER' as const,
     createdAt,
