@@ -23,21 +23,31 @@ const App: React.FC = () => {
       if (fbUser) {
         const { getUserByEmail } = await import('./lib/users');
         const dbUser = await getUserByEmail(fbUser.email ?? '');
-        const status = dbUser?.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
-        setAuthState({
-          user: {
-            id: fbUser.uid,
-            name: dbUser?.name ?? fbUser.displayName ?? fbUser.email ?? 'Usuário',
-            email: fbUser.email ?? '',
-            role: 'PARTNER',
-            status,
-          },
-          isAuthenticated: true,
-        });
+        if (!dbUser || dbUser.status === 'REJECTED') {
+          setAuthState({ user: null, isAuthenticated: false });
+        } else {
+          const status = dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+          setAuthState({
+            user: {
+              id: fbUser.uid,
+              name: dbUser.name ?? fbUser.displayName ?? fbUser.email ?? 'Usuário',
+              email: fbUser.email ?? '',
+              role: 'PARTNER',
+              status,
+            },
+            isAuthenticated: true,
+          });
+        }
       } else {
         const saved = localStorage.getItem('tillit_user');
         if (saved) {
-          setAuthState({ user: JSON.parse(saved), isAuthenticated: true });
+          const parsed = JSON.parse(saved);
+          if (parsed?.role === 'ADMIN') {
+            setAuthState({ user: parsed, isAuthenticated: true });
+          } else {
+            localStorage.removeItem('tillit_user');
+            setAuthState({ user: null, isAuthenticated: false });
+          }
         } else {
           setAuthState({ user: null, isAuthenticated: false });
         }

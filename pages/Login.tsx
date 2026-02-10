@@ -36,6 +36,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (!isAdmin) {
         const { getUserByEmail } = await import('../lib/users');
         const dbUser = await getUserByEmail(fbUser.email ?? '');
+        if (dbUser?.status === 'REJECTED') {
+          setError('Seu cadastro foi rejeitado. Entre em contato com o suporte.');
+          return;
+        }
         if (dbUser?.status === 'PENDING_APPROVAL') status = 'PENDING_APPROVAL';
         if (dbUser && !dbUser.phone?.trim()) {
           setPendingPhone({
@@ -190,8 +194,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 space-y-8">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-50 bg-pattern">
+      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-10 space-y-8">
         <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#003366] transition-colors text-sm font-medium mb-4">
           <ArrowLeft size={18} /> Voltar
         </Link>

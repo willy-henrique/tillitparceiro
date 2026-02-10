@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  scroll-behavior: smooth;
+}
+
+.bg-pattern {
+  background-color: #003366;
+  background-image: url("/logofundo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}

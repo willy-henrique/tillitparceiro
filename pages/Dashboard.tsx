@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LogOut, LayoutDashboard, PlusCircle, Users, 
   TrendingUp, Search, Bell, Filter, ChevronRight, 
-  X, CheckCircle2, AlertCircle, RefreshCw, DollarSign, ArrowLeft, MessageSquare, CreditCard, Copy
+  X, CheckCircle2, AlertCircle, RefreshCw, DollarSign, ArrowLeft, MessageSquare, CreditCard, Copy, Menu
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
@@ -54,6 +54,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const [pixLoading, setPixLoading] = useState(false);
   const [pixError, setPixError] = useState('');
   const [pixSuccess, setPixSuccess] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     const closeDropdowns = () => { setShowFilterDropdown(false); setShowNotifications(false); };
@@ -222,56 +223,67 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
     }
   };
 
-  return (
-    <div className="flex h-screen bg-[#F8FAFC]">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#003366] text-white hidden lg:flex flex-col p-6">
-        <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity">
-          <Logo size="sm" variant="light" />
-          <span className="font-bold text-lg">Parceiro+</span>
-        </Link>
-        <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm">
-          <ArrowLeft size={18} /> Voltar ao site
-        </Link>
-        
-        <nav className="flex-1 space-y-2">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${activeTab === 'dashboard' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <LayoutDashboard size={20} /> Dashboard
+  const SidebarContent = () => (
+    <>
+      <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity" onClick={() => setShowMobileMenu(false)}>
+        <Logo size="sm" variant="light" />
+        <span className="font-bold text-lg">Parceiro+</span>
+      </Link>
+      <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm" onClick={() => setShowMobileMenu(false)}>
+        <ArrowLeft size={18} /> Voltar ao site
+      </Link>
+      <nav className="flex-1 space-y-2">
+        {(['dashboard', 'indications', 'extract', 'payment'] as Tab[]).map((tab) => (
+          <button key={tab} onClick={() => { setActiveTab(tab); setShowMobileMenu(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all text-left ${activeTab === tab ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            {tab === 'dashboard' && <LayoutDashboard size={20} />}
+            {tab === 'indications' && <Users size={20} />}
+            {tab === 'extract' && <TrendingUp size={20} />}
+            {tab === 'payment' && <CreditCard size={20} />}
+            {tab === 'dashboard' && 'Dashboard'}
+            {tab === 'indications' && 'Minhas Indicações'}
+            {tab === 'extract' && 'Extrato de Bônus'}
+            {tab === 'payment' && 'Dados PIX'}
           </button>
-          <button
-            onClick={() => setActiveTab('indications')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${activeTab === 'indications' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <Users size={20} /> Minhas Indicações
-          </button>
-          <button
-            onClick={() => setActiveTab('extract')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${activeTab === 'extract' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <TrendingUp size={20} /> Extrato de Bônus
-          </button>
-          <button
-            onClick={() => setActiveTab('payment')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${activeTab === 'payment' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <CreditCard size={20} /> Dados PIX
-          </button>
-        </nav>
+        ))}
+      </nav>
+      <button onClick={() => { onLogout(); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 transition-colors font-bold text-sm">
+        <LogOut size={18} /> Sair do Portal
+      </button>
+    </>
+  );
 
-        <button onClick={onLogout} className="flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 transition-colors mt-auto font-bold text-sm">
-          <LogOut size={18} /> Sair do Portal
-        </button>
+  return (
+    <div className="flex h-screen bg-[#F8FAFC] overflow-x-hidden">
+      {/* Sidebar - Desktop */}
+      <aside className="w-64 bg-[#003366] text-white hidden lg:flex flex-col p-6 flex-shrink-0">
+        <SidebarContent />
       </aside>
+
+      {/* Mobile sidebar overlay */}
+      {showMobileMenu && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setShowMobileMenu(false)} aria-hidden="true" />
+          <aside className="fixed inset-y-0 left-0 w-72 bg-[#003366] text-white flex flex-col p-6 z-50 lg:hidden">
+            <div className="flex justify-between items-center mb-6">
+              <Logo size="sm" variant="light" />
+              <button onClick={() => setShowMobileMenu(false)} className="p-2 text-white/70 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+            <SidebarContent />
+          </aside>
+        </>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 flex-1">
-             <div className="relative w-96 hidden md:block">
+        <header className="h-16 lg:h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
+          <button onClick={() => setShowMobileMenu(true)} className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+            <Menu size={24} />
+          </button>
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+             <div className="relative flex-1 max-w-sm hidden sm:block">
                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                <input
                  type="text"
@@ -310,22 +322,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-3 border-l border-slate-200 pl-6">
-              <div className="text-right">
-                <p className="text-sm font-bold text-[#003366]">{user.name}</p>
+            <div className="flex items-center gap-2 sm:gap-3 border-l border-slate-200 pl-4 sm:pl-6 flex-shrink-0">
+              <div className="text-right hidden sm:block min-w-0">
+                <p className="text-sm font-bold text-[#003366] truncate">{user.name}</p>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Membro Premium</p>
               </div>
-              <img src="https://picsum.photos/seed/partner/100/100" className="w-10 h-10 rounded-full border-2 border-slate-100" alt="Avatar" />
+              <img src="https://picsum.photos/seed/partner/100/100" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-slate-100 flex-shrink-0" alt="Avatar" />
             </div>
           </div>
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">
           {/* Welcome & CTA */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-black text-[#003366]">Olá, {user.name.split(' ')[0]}!</h1>
+              <h1 className="text-2xl sm:text-3xl font-black text-[#003366]">Olá, {user.name.split(' ')[0]}!</h1>
               <p className="text-slate-500">
                 {activeTab === 'dashboard' && 'Acompanhe seu progresso e faça novas indicações.'}
                 {activeTab === 'indications' && 'Suas indicações e acompanhamento.'}
@@ -345,7 +357,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
 
           {/* Gamification Bar - só no dashboard */}
           {(activeTab === 'dashboard' || activeTab === 'indications') && (
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
+          <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full -mr-32 -mt-32 pointer-events-none"></div>
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-6 relative z-10">
               <div className="flex-1 space-y-4">

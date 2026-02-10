@@ -37,6 +37,10 @@ const Register: React.FC<RegisterProps> = () => {
       const name = user.displayName ?? user.email ?? 'Usuário';
       const existing = await getUserByEmail(email);
       if (existing) {
+        if (existing.status === 'REJECTED') {
+          setError('Seu cadastro foi rejeitado. Entre em contato com o suporte.');
+          return;
+        }
         if (existing.status === 'APPROVED') {
           if (!existing.phone?.trim()) {
             setGoogleUserPendingPhone({ name, email });
@@ -195,7 +199,7 @@ const Register: React.FC<RegisterProps> = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
-      <div className="max-w-2xl w-full grid md:grid-cols-5 bg-white rounded-3xl shadow-2xl overflow-hidden relative">
+      <div className="max-w-2xl w-full grid md:grid-cols-5 bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative">
         <Link to="/" className="absolute top-4 left-4 z-20 inline-flex items-center gap-2 text-slate-500 hover:text-[#003366] transition-colors text-sm font-medium">
           <ArrowLeft size={18} /> Voltar
         </Link>
@@ -228,7 +232,7 @@ const Register: React.FC<RegisterProps> = () => {
           </div>
         </div>
 
-        <div className="md:col-span-3 p-10 space-y-8">
+        <div className="md:col-span-3 p-6 sm:p-10 space-y-6 sm:space-y-8">
           <div>
             <h1 className="text-2xl font-bold text-[#003366]">Criar Conta de Parceiro</h1>
             <p className="text-slate-500 text-sm">Preencha os dados abaixo ou use o Google para começar</p>

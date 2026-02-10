@@ -10,19 +10,20 @@ const Landing: React.FC = () => {
       {/* Navigation */}
       <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            <div className="flex items-center gap-2">
-              <Logo size="md" variant="light" />
-              <span className="text-[#003366] font-bold text-2xl tracking-tighter">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
+          <div className="flex justify-between h-16 sm:h-20 items-center">
+            <div className="flex items-center gap-2 min-w-0">
+              <Logo size="sm" variant="light" className="flex-shrink-0 sm:hidden" />
+              <Logo size="md" variant="light" className="flex-shrink-0 hidden sm:flex" />
+              <span className="text-[#003366] font-bold text-lg sm:text-2xl tracking-tighter truncate">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
             </div>
             <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
               <a href="#programa" className="hover:text-[#003366] transition-colors">O Programa</a>
               <a href="#solucoes" className="hover:text-[#003366] transition-colors">Soluções</a>
               <a href="#ganhos" className="hover:text-[#003366] transition-colors">Ganhos</a>
             </div>
-            <div className="flex items-center gap-4">
-              <Link to="/login" className="text-sm font-semibold text-[#003366] hover:underline">Entrar</Link>
-              <Link to="/registrar" className="bg-[#00B050] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:scale-105 transition-all shadow-lg shadow-green-500/20">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+              <Link to="/login" className="text-xs sm:text-sm font-semibold text-[#003366] hover:underline py-2">Entrar</Link>
+              <Link to="/registrar" className="bg-[#00B050] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm hover:scale-105 transition-all shadow-lg shadow-green-500/20">
                 Quero Indicar
               </Link>
             </div>
@@ -31,17 +32,17 @@ const Landing: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <header className="pt-32 pb-20 px-4 bg-pattern relative overflow-hidden">
+      <header className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 bg-pattern relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00B050]/10 to-transparent pointer-events-none"></div>
         <div className="max-w-7xl mx-auto relative z-10 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-1.5 rounded-full border border-white/20">
               <span className="text-[#00B050] font-bold text-xs uppercase tracking-widest">Tecnologia feita para pessoas</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold text-white leading-tight">
               Sua indicação vale <span className="text-[#00B050]">dinheiro vivo.</span>
             </h1>
-            <p className="text-xl text-slate-300 max-w-lg leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-lg leading-relaxed">
               Ganhe até <strong className="text-white">R$ 300,00 por contrato</strong> fechado. Faça parte do ecossistema que mais cresce no Brasil.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">

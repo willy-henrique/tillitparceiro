@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   LogOut, Shield, MessageSquare, CreditCard, 
   Bell, UserCheck, ExternalLink, Calendar, CheckCircle2, 
-  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X, RefreshCw
+  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X, RefreshCw, Menu
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
@@ -29,6 +29,7 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   const [confirmingPayment, setConfirmingPayment] = useState(false);
   const [approvalLoading, setApprovalLoading] = useState(false);
   const [approvalError, setApprovalError] = useState<string | null>(null);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const fetchPendingPartners = () => {
     setApprovalLoading(true);
@@ -159,48 +160,60 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
     navigator.clipboard.writeText(text);
   };
 
-  return (
-    <div className="flex h-screen bg-slate-100">
-      {/* Sidebar Admin */}
-      <aside className="w-64 bg-slate-900 text-white hidden lg:flex flex-col p-6">
-        <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity">
-          <Logo size="sm" variant="admin" />
-          <span className="font-bold text-lg">Admin<span className="text-[#00B050]">+</span></span>
-        </Link>
-        <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm">
-          <ArrowLeft size={18} /> Voltar ao site
-        </Link>
-        
-        <nav className="flex-1 space-y-2">
-          <button 
-            onClick={() => setTab('approval')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${tab === 'approval' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <UserPlus size={20} /> Aprovar Utilização
+  const AdminSidebarContent = () => (
+    <>
+      <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity" onClick={() => setShowMobileMenu(false)}>
+        <Logo size="sm" variant="admin" />
+        <span className="font-bold text-lg">Admin<span className="text-[#00B050]">+</span></span>
+      </Link>
+      <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm" onClick={() => setShowMobileMenu(false)}>
+        <ArrowLeft size={18} /> Voltar ao site
+      </Link>
+      <nav className="flex-1 space-y-2">
+        {(['approval', 'leads', 'payments'] as Tab[]).map((t) => (
+          <button key={t} onClick={() => { setTab(t); setShowMobileMenu(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all text-left ${tab === t ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            {t === 'approval' && <><UserPlus size={20} /> Aprovar Utilização</>}
+            {t === 'leads' && <><Shield size={20} /> Indicações / Leads</>}
+            {t === 'payments' && <><CreditCard size={20} /> Pagamentos</>}
           </button>
-          <button 
-            onClick={() => setTab('leads')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${tab === 'leads' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <Shield size={20} /> Indicações / Leads
-          </button>
-          <button 
-            onClick={() => setTab('payments')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${tab === 'payments' ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-          >
-            <CreditCard size={20} /> Pagamentos
-          </button>
-        </nav>
+        ))}
+      </nav>
+      <button onClick={() => { onLogout(); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 transition-colors font-bold text-sm border-t border-white/10 pt-6">
+        <LogOut size={18} /> Logout Admin
+      </button>
+    </>
+  );
 
-        <button onClick={onLogout} className="flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 transition-colors mt-auto font-bold text-sm border-t border-white/10 pt-6">
-          <LogOut size={18} /> Logout Admin
-        </button>
+  return (
+    <div className="flex h-screen bg-slate-100 overflow-x-hidden">
+      {/* Sidebar Admin - Desktop */}
+      <aside className="w-64 bg-slate-900 text-white hidden lg:flex flex-col p-6 flex-shrink-0">
+        <AdminSidebarContent />
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden">
+      {/* Mobile sidebar overlay */}
+      {showMobileMenu && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setShowMobileMenu(false)} aria-hidden="true" />
+          <aside className="fixed inset-y-0 left-0 w-72 bg-slate-900 text-white flex flex-col p-6 z-50 lg:hidden">
+            <div className="flex justify-between items-center mb-6">
+              <Logo size="sm" variant="admin" />
+              <button onClick={() => setShowMobileMenu(false)} className="p-2 text-white/70 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+            <AdminSidebarContent />
+          </aside>
+        </>
+      )}
+
+      <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Header Admin */}
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-800">
+        <header className="h-16 lg:h-20 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
+          <button onClick={() => setShowMobileMenu(true)} className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+            <Menu size={24} />
+          </button>
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 truncate flex-1">
             {tab === 'approval' && 'Aprovar Utilização do Site'}
             {tab === 'leads' && 'Gestão de Indicações'}
             {tab === 'payments' && 'Pagamento de Bônus'}
@@ -232,7 +245,7 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 overflow-x-auto">
           {tab === 'approval' && (
             <div className="space-y-8">
               <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -251,11 +264,11 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
                   {approvalError}
                 </div>
               )}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <table className="w-full text-left">
+              <div className="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
+                <table className="w-full text-left min-w-[600px]">
                   <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest">
                     <tr>
-                      <th className="px-8 py-4">Nome</th>
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">Nome</th>
                       <th className="px-8 py-4">E-mail</th>
                       <th className="px-8 py-4">Telefone</th>
                       <th className="px-8 py-4">Data</th>
