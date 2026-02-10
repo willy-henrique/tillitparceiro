@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ShieldCheck, Clock, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { createPartnerRequest } from '../lib/users';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShieldCheck, Clock, CheckCircle2, ArrowLeft, Chrome } from 'lucide-react';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { createPartnerRequest, createPartnerRequestFromGoogle, getUserByEmail } from '../lib/users';
 
 interface RegisterProps {
   onRegister?: (user: unknown) => void;
 }
 
 const Register: React.FC<RegisterProps> = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,6 +21,35 @@ const Register: React.FC<RegisterProps> = () => {
     password: '',
     terms: false
   });
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+
+  const handleGoogleRegister = async () => {
+    setLoadingGoogle(true);
+    setError('');
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const email = user.email ?? '';
+      const name = user.displayName ?? user.email ?? 'Usuário';
+      const existing = await getUserByEmail(email);
+      if (existing) {
+        if (existing.status === 'APPROVED') {
+          navigate('/dashboard');
+        } else {
+          navigate('/aguardando');
+        }
+        return;
+      }
+      await createPartnerRequestFromGoogle({ name, email });
+      navigate('/aguardando');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao cadastrar com Google';
+      setError(msg.includes('popup-closed') ? '' : 'Erro ao cadastrar com Google. Tente novamente.');
+    } finally {
+      setLoadingGoogle(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,7 +147,22 @@ const Register: React.FC<RegisterProps> = () => {
         <div className="md:col-span-3 p-10 space-y-8">
           <div>
             <h1 className="text-2xl font-bold text-[#003366]">Criar Conta de Parceiro</h1>
-            <p className="text-slate-500 text-sm">Preencha os dados abaixo para começar</p>
+            <p className="text-slate-500 text-sm">Preencha os dados abaixo ou use o Google para começar</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleRegister}
+            disabled={loadingGoogle}
+            className="w-full flex items-center justify-center gap-3 border-2 border-slate-200 py-3.5 rounded-xl hover:bg-slate-50 transition-colors font-semibold text-slate-700 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Chrome size={22} className="text-red-500" />
+            {loadingGoogle ? 'Cadastrando...' : 'Cadastrar com Google'}
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-200"></span></div>
+            <div className="relative flex justify-center text-xs uppercase tracking-widest"><span className="bg-white px-4 text-slate-400">ou com formulário</span></div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -25,6 +25,34 @@ export interface PartnerRequest {
 
 const COLLECTION = 'users';
 
+export async function createPartnerRequestFromGoogle(data: {
+  name: string;
+  email: string;
+  phone?: string;
+}): Promise<PartnerRequest> {
+  const col = collection(db, COLLECTION);
+  const docData = {
+    name: data.name,
+    email: data.email.toLowerCase().trim(),
+    phone: data.phone ?? '',
+    status: 'PENDING_APPROVAL',
+    role: 'PARTNER',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  };
+  const ref = await addDoc(col, docData);
+  return {
+    id: ref.id,
+    name: data.name,
+    email: data.email.toLowerCase().trim(),
+    phone: data.phone ?? '',
+    status: 'PENDING_APPROVAL',
+    role: 'PARTNER',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export async function createPartnerRequest(data: {
   name: string;
   email: string;
