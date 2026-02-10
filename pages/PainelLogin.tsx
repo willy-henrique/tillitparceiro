@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, ChevronRight, ArrowLeft } from 'lucide-react';
 import { verifyAdminCredentials } from '../lib/auth';
+import Logo from '../components/Logo';
 import { User } from '../types';
 
 interface PainelLoginProps {
@@ -46,9 +47,7 @@ const PainelLogin: React.FC<PainelLoginProps> = ({ onLogin }) => {
           <ArrowLeft size={18} /> Voltar
         </Link>
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mx-auto">
-            <span className="text-white font-black text-xl">T</span>
-          </div>
+          <Logo size="lg" variant="admin" className="mx-auto" />
           <h1 className="text-2xl font-bold text-[#003366]">Painel Administrativo</h1>
           <p className="text-slate-500 text-sm">Acesso restrito à administração</p>
         </div>

@@ -9,6 +9,7 @@ import { User, Referral, ReferralStatus } from '../types';
 import { getReferrals, updateReferralStatus } from '../lib/referrals';
 import { getPendingPartners, approvePartner, rejectPartner, type PartnerRequest } from '../lib/users';
 import { getPartnerPix, getPartnersPix, formatPixKeyDisplay, type PartnerPixData } from '../lib/partners';
+import Logo from '../components/Logo';
 
 type Tab = 'approval' | 'leads' | 'payments';
 
@@ -141,9 +142,7 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
       {/* Sidebar Admin */}
       <aside className="w-64 bg-slate-900 text-white hidden lg:flex flex-col p-6">
         <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity">
-          <div className="w-8 h-8 bg-[#00B050] rounded-lg flex items-center justify-center">
-            <span className="text-white font-black text-sm">T</span>
-          </div>
+          <Logo size="sm" variant="admin" />
           <span className="font-bold text-lg">Admin<span className="text-[#00B050]">+</span></span>
         </Link>
         <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm">

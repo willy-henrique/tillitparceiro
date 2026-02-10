@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, DollarSign, Users, Award, Briefcase, CheckCircle2 } from 'lucide-react';
 import { MOCK_PRODUCTS, THEME } from '../constants';
+import Logo from '../components/Logo';
 
 const Landing: React.FC = () => {
   return (
@@ -12,9 +12,7 @@ const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-[#003366] rounded-xl flex items-center justify-center">
-                <span className="text-white font-black text-xl">T</span>
-              </div>
+              <Logo size="md" variant="light" />
               <span className="text-[#003366] font-bold text-2xl tracking-tighter">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
             </div>
             <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
@@ -171,9 +169,7 @@ const Landing: React.FC = () => {
       <footer className="py-12 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#003366] rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-sm">T</span>
-            </div>
+            <Logo size="sm" variant="light" />
             <span className="text-[#003366] font-bold text-lg">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
           </div>
           <p className="text-slate-400 text-xs">© 2026 TILLIT Tecnologia. Todos os direitos reservados. LGPD Compliance.</p>

@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
 import { getReferrals, addReferral } from '../lib/referrals';
 import { getPartnerPix, savePartnerPix, formatPixKeyDisplay, type PartnerPixData, type PixKeyType } from '../lib/partners';
+import Logo from '../components/Logo';
 
 type Tab = 'dashboard' | 'indications' | 'extract' | 'payment';
 
@@ -226,9 +227,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
       {/* Sidebar */}
       <aside className="w-64 bg-[#003366] text-white hidden lg:flex flex-col p-6">
         <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity">
-          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-            <span className="text-[#003366] font-black text-sm">T</span>
-          </div>
+          <Logo size="sm" variant="light" />
           <span className="font-bold text-lg">Parceiro+</span>
         </Link>
         <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm">

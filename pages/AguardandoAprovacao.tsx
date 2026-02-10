@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, ArrowLeft } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const AguardandoAprovacao: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-12 text-center space-y-8">
         <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-[#003366] transition-colors text-sm font-medium">
+          <Logo size="sm" variant="default" />
           <ArrowLeft size={18} /> Voltar
         </Link>
         <div className="w-24 h-24 bg-orange-50 text-[#FF8C00] rounded-full flex items-center justify-center mx-auto">

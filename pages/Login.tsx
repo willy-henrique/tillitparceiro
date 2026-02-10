@@ -4,6 +4,7 @@ import { Mail, Lock, ChevronRight, Chrome, ArrowLeft } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { User } from '../types';
+import Logo from '../components/Logo';
 
 interface LoginProps {
   onLogin: (user: User) => void;
@@ -82,9 +83,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         </Link>
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2 mb-4">
-             <div className="w-8 h-8 bg-[#003366] rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-sm">T</span>
-            </div>
+            <Logo size="sm" variant="light" />
             <span className="text-[#003366] font-black text-xl tracking-tighter uppercase">Parceiro+</span>
           </Link>
           <h1 className="text-2xl font-bold text-[#003366]">Bem-vindo de volta</h1>

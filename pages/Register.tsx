@@ -4,6 +4,7 @@ import { ShieldCheck, Clock, CheckCircle2, ArrowLeft, Chrome } from 'lucide-reac
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { createPartnerRequest, createPartnerRequestFromGoogle, getUserByEmail } from '../lib/users';
+import Logo from '../components/Logo';
 
 interface RegisterProps {
   onRegister?: (user: unknown) => void;
@@ -116,9 +117,7 @@ const Register: React.FC<RegisterProps> = () => {
         <div className="md:col-span-2 bg-[#003366] p-10 text-white flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
           <div className="space-y-6 relative z-10">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-[#003366] font-black text-xl">T</span>
-            </div>
+            <Logo size="md" variant="light" />
             <h2 className="text-3xl font-black leading-tight">Torne-se um <span className="text-[#00B050]">Embaixador</span> TILLIT.</h2>
             <p className="text-slate-300 text-sm">Transforme sua rede de contatos em uma fonte recorrente de ganhos.</p>
           </div>
