@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Clock, CheckCircle2, ArrowLeft, Chrome } from 'lucide-react';
+import { ShieldCheck, Clock, CheckCircle2, ArrowLeft, Chrome, MessageSquare } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { createPartnerRequest, createPartnerRequestFromGoogle, getUserByEmail } from '../lib/users';
@@ -23,6 +23,8 @@ const Register: React.FC<RegisterProps> = () => {
     terms: false
   });
   const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const [googleUserPendingPhone, setGoogleUserPendingPhone] = useState<{ name: string; email: string } | null>(null);
+  const [phoneForGoogle, setPhoneForGoogle] = useState('');
 
   const handleGoogleRegister = async () => {
     setLoadingGoogle(true);
@@ -36,19 +38,63 @@ const Register: React.FC<RegisterProps> = () => {
       const existing = await getUserByEmail(email);
       if (existing) {
         if (existing.status === 'APPROVED') {
+          if (!existing.phone?.trim()) {
+            setGoogleUserPendingPhone({ name, email });
+            setPhoneForGoogle('');
+            return;
+          }
           navigate('/dashboard');
         } else {
+          if (!existing.phone?.trim()) {
+            setGoogleUserPendingPhone({ name, email });
+            setPhoneForGoogle('');
+            return;
+          }
           navigate('/aguardando');
         }
         return;
       }
-      await createPartnerRequestFromGoogle({ name, email });
-      navigate('/aguardando');
+      setGoogleUserPendingPhone({ name, email });
+      setPhoneForGoogle('');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao cadastrar com Google';
       setError(msg.includes('popup-closed') ? '' : 'Erro ao cadastrar com Google. Tente novamente.');
     } finally {
       setLoadingGoogle(false);
+    }
+  };
+
+  const handleSubmitPhoneForGoogle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!googleUserPendingPhone || !phoneForGoogle.trim()) return;
+    const digits = phoneForGoogle.replace(/\D/g, '');
+    if (digits.length < 10) {
+      setError('Informe um WhatsApp válido com DDD.');
+      return;
+    }
+    const phone = phoneForGoogle.trim();
+    setLoading(true);
+    setError('');
+    try {
+      const existing = await getUserByEmail(googleUserPendingPhone.email);
+      if (existing) {
+        const { updateUserPhone } = await import('../lib/users');
+        await updateUserPhone(existing.id, phone);
+        if (existing.status === 'APPROVED') navigate('/dashboard');
+        else navigate('/aguardando');
+      } else {
+        await createPartnerRequestFromGoogle({
+          name: googleUserPendingPhone.name,
+          email: googleUserPendingPhone.email,
+          phone,
+        });
+        window.location.href = '/#/aguardando';
+        return;
+      }
+    } catch {
+      setError('Erro ao salvar. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +115,45 @@ const Register: React.FC<RegisterProps> = () => {
       setLoading(false);
     }
   };
+
+  if (googleUserPendingPhone) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 space-y-8">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 bg-[#00B050]/10 rounded-full flex items-center justify-center mx-auto">
+              <MessageSquare className="text-[#00B050]" size={32} />
+            </div>
+            <h1 className="text-2xl font-bold text-[#003366]">Informe seu WhatsApp</h1>
+            <p className="text-slate-500 text-sm">
+              Precisamos do seu número para contato da equipe e liberação do acesso ao painel.
+            </p>
+          </div>
+          <form onSubmit={handleSubmitPhoneForGoogle} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">WhatsApp (com DDD)</label>
+              <input
+                type="tel"
+                required
+                value={phoneForGoogle}
+                onChange={(e) => setPhoneForGoogle(e.target.value)}
+                placeholder="(11) 99999-9999"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+              />
+            </div>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold hover:bg-green-600 transition-all disabled:opacity-60"
+            >
+              {loading ? 'Enviando...' : 'Continuar'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (step === 2) {
     return (

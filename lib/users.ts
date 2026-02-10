@@ -124,6 +124,14 @@ export async function rejectPartner(id: string): Promise<void> {
   });
 }
 
+export async function updateUserPhone(id: string, phone: string): Promise<void> {
+  const ref = doc(db, COLLECTION, id);
+  await updateDoc(ref, {
+    phone: phone.trim(),
+    updatedAt: Timestamp.now(),
+  });
+}
+
 export async function getUserByEmail(email: string): Promise<PartnerRequest | null> {
   const col = collection(db, COLLECTION);
   const q = query(col, where('email', '==', email.toLowerCase().trim()));

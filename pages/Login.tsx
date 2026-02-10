@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ChevronRight, Chrome, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ChevronRight, Chrome, ArrowLeft, MessageSquare } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { User } from '../types';
@@ -16,6 +16,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [error, setError] = useState('');
+  const [pendingPhone, setPendingPhone] = useState<{
+    dbUser: { id: string; name: string; email: string; status: string } | null;
+    fbUser: { uid: string; displayName: string | null; email: string | null };
+    isAdmin: boolean;
+  } | null>(null);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [phoneLoading, setPhoneLoading] = useState(false);
 
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
@@ -30,6 +37,27 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         const { getUserByEmail } = await import('../lib/users');
         const dbUser = await getUserByEmail(fbUser.email ?? '');
         if (dbUser?.status === 'PENDING_APPROVAL') status = 'PENDING_APPROVAL';
+        if (dbUser && !dbUser.phone?.trim()) {
+          setPendingPhone({
+            dbUser: { id: dbUser.id, name: dbUser.name, email: dbUser.email, status: dbUser.status },
+            fbUser: { uid: fbUser.uid, displayName: fbUser.displayName, email: fbUser.email },
+            isAdmin: false,
+          });
+          setPhoneInput('');
+          setError('');
+          return;
+        }
+        if (!dbUser) {
+          const { createPartnerRequestFromGoogle } = await import('../lib/users');
+          setPendingPhone({
+            dbUser: null,
+            fbUser: { uid: fbUser.uid, displayName: fbUser.displayName, email: fbUser.email },
+            isAdmin: false,
+          });
+          setPhoneInput('');
+          setError('');
+          return;
+        }
       }
       const appUser: User = {
         id: fbUser.uid,
@@ -46,6 +74,53 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setError(message.includes('popup-closed') ? '' : message);
     } finally {
       setLoadingGoogle(false);
+    }
+  };
+
+  const handleSubmitPhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pendingPhone) return;
+    const phone = phoneInput.trim();
+    if (phone.replace(/\D/g, '').length < 10) {
+      setError('Informe um WhatsApp válido com DDD.');
+      return;
+    }
+    setPhoneLoading(true);
+    setError('');
+    try {
+      const { updateUserPhone, createPartnerRequestFromGoogle } = await import('../lib/users');
+      if (pendingPhone.dbUser) {
+        await updateUserPhone(pendingPhone.dbUser.id, phone);
+        const status = pendingPhone.dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+        onLogin({
+          id: pendingPhone.fbUser.uid,
+          name: pendingPhone.dbUser.name,
+          email: pendingPhone.dbUser.email,
+          role: 'PARTNER',
+          status,
+        });
+        if (status === 'PENDING_APPROVAL') navigate('/aguardando');
+        else navigate('/dashboard');
+      } else {
+        await createPartnerRequestFromGoogle({
+          name: pendingPhone.fbUser.displayName ?? pendingPhone.fbUser.email ?? 'Usuário',
+          email: pendingPhone.fbUser.email ?? '',
+          phone,
+        });
+        onLogin({
+          id: pendingPhone.fbUser.uid,
+          name: pendingPhone.fbUser.displayName ?? pendingPhone.fbUser.email ?? 'Usuário',
+          email: pendingPhone.fbUser.email ?? '',
+          role: 'PARTNER',
+          status: 'PENDING_APPROVAL',
+        });
+        navigate('/aguardando');
+      }
+      setPendingPhone(null);
+    } catch {
+      setError('Erro ao salvar. Tente novamente.');
+    } finally {
+      setPhoneLoading(false);
     }
   };
 
@@ -74,6 +149,45 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       navigate('/dashboard');
     }
   };
+
+  if (pendingPhone) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 space-y-8">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 bg-[#00B050]/10 rounded-full flex items-center justify-center mx-auto">
+              <MessageSquare className="text-[#00B050]" size={32} />
+            </div>
+            <h1 className="text-2xl font-bold text-[#003366]">Informe seu WhatsApp</h1>
+            <p className="text-slate-500 text-sm">
+              Precisamos do seu número para contato da equipe e liberação do acesso ao painel.
+            </p>
+          </div>
+          <form onSubmit={handleSubmitPhone} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">WhatsApp (com DDD)</label>
+              <input
+                type="tel"
+                required
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value)}
+                placeholder="(11) 99999-9999"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+              />
+            </div>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <button
+              type="submit"
+              disabled={phoneLoading}
+              className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold hover:bg-[#002244] transition-all disabled:opacity-60"
+            >
+              {phoneLoading ? 'Enviando...' : 'Continuar'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
