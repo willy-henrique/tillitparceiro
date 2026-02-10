@@ -1,16 +1,16 @@
-
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, ShieldCheck, Clock, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { User as UserType } from '../types';
+import { Link } from 'react-router-dom';
+import { ShieldCheck, Clock, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { createPartnerRequest } from '../lib/users';
 
 interface RegisterProps {
-  onRegister: (user: UserType) => void;
+  onRegister?: (user: unknown) => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ onRegister }) => {
-  const navigate = useNavigate();
+const Register: React.FC<RegisterProps> = () => {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,22 +19,22 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     terms: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStep(2); // Go to "Analysis" step
-    
-    // Simulate approval after 3 seconds for demo
-    setTimeout(() => {
-      const newUser: UserType = {
-        id: 'usr_' + Math.random().toString(36).substr(2, 9),
+    setLoading(true);
+    setError('');
+    try {
+      await createPartnerRequest({
         name: formData.name,
         email: formData.email,
-        role: 'PARTNER',
-        status: 'APPROVED'
-      };
-      onRegister(newUser);
-      navigate('/dashboard');
-    }, 4000);
+        phone: formData.phone,
+      });
+      setStep(2);
+    } catch {
+      setError('Erro ao enviar cadastro. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (step === 2) {
@@ -69,7 +69,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
               </li>
             </ul>
           </div>
-          <p className="text-xs text-slate-400">Normalmente aprovamos em menos de 24 horas.</p>
+          <p className="text-xs text-slate-400">Normalmente aprovamos em menos de 24 horas. Use o mesmo e-mail no login com Google para acessar após aprovação.</p>
         </div>
       </div>
     );
@@ -175,8 +175,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
               </label>
             </div>
 
-            <button type="submit" className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20">
-              Solicitar Acesso <ShieldCheck size={18} />
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <button type="submit" disabled={loading} className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed">
+              {loading ? 'Enviando...' : 'Solicitar Acesso'} <ShieldCheck size={18} />
             </button>
           </form>
 

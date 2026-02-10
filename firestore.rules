@@ -4,5 +4,11 @@ service cloud.firestore {
     match /referrals/{referralId} {
       allow read, write: if true;
     }
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+    match /partners/{partnerId} {
+      allow read, write: if true;
+    }
   }
 }

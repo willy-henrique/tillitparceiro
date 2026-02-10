@@ -80,5 +80,8 @@ export async function updateReferralStatus(
   if (status === ReferralStatus.CONVERTIDA) {
     updates.implementationPaidAt = Timestamp.now();
   }
+  if (status === ReferralStatus.PAGO) {
+    updates.paidAt = Timestamp.now();
+  }
   await updateDoc(ref, updates);
 }

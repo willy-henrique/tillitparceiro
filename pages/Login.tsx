@@ -1,7 +1,8 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ChevronRight, Chrome, ArrowLeft } from 'lucide-react';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../lib/firebase';
 import { User } from '../types';
 
 interface LoginProps {
@@ -12,10 +13,44 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleGoogleLogin = async () => {
+    setLoadingGoogle(true);
+    setError('');
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const fbUser = result.user;
+      const isAdmin = fbUser.email?.toLowerCase().includes('admin') ?? false;
+      let status: 'APPROVED' | 'PENDING_APPROVAL' = 'APPROVED';
+      if (!isAdmin) {
+        const { getUserByEmail } = await import('../lib/users');
+        const dbUser = await getUserByEmail(fbUser.email ?? '');
+        if (dbUser?.status === 'PENDING_APPROVAL') status = 'PENDING_APPROVAL';
+      }
+      const appUser: User = {
+        id: fbUser.uid,
+        name: fbUser.displayName ?? fbUser.email ?? 'Usuário',
+        email: fbUser.email ?? '',
+        role: isAdmin ? 'ADMIN' : 'PARTNER',
+        status,
+      };
+      onLogin(appUser);
+      if (status === 'PENDING_APPROVAL') navigate('/aguardando');
+      else navigate(isAdmin ? '/painel' : '/dashboard');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro ao entrar com Google';
+      setError(message.includes('popup-closed') ? '' : message);
+    } finally {
+      setLoadingGoogle(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate auth logic
+    // Simulate auth logic (email/password - use Google para parceiros)
     if (email.includes('admin')) {
       const adminUser: User = {
         id: 'adm_1',
@@ -25,7 +60,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         status: 'APPROVED'
       };
       onLogin(adminUser);
-      navigate('/gestao-comercial');
+      navigate('/painel');
     } else {
       const partnerUser: User = {
         id: 'usr_1',
@@ -56,8 +91,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <p className="text-slate-500 text-sm">Acesse sua conta para gerenciar indicações</p>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-3 border border-slate-200 py-3 rounded-xl hover:bg-slate-50 transition-colors font-semibold text-slate-700">
-          <Chrome size={20} className="text-red-500" /> Entrar com Google
+        {error && (
+          <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{error}</p>
+        )}
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={loadingGoogle}
+          className="w-full flex items-center justify-center gap-3 border border-slate-200 py-3 rounded-xl hover:bg-slate-50 transition-colors font-semibold text-slate-700 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <Chrome size={20} className="text-red-500" />
+          {loadingGoogle ? 'Entrando...' : 'Entrar com Google'}
         </button>
 
         <div className="relative">
@@ -106,6 +150,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         <p className="text-center text-sm text-slate-500">
           Ainda não é parceiro? <Link to="/registrar" className="text-[#00B050] font-bold hover:underline">Cadastre-se grátis</Link>
+        </p>
+        <p className="text-center text-xs text-slate-400">
+          <Link to="/painel" className="text-slate-500 hover:text-[#003366]">Acesso administrativo</Link>
         </p>
       </div>
     </div>
