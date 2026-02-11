@@ -209,7 +209,7 @@ const Register: React.FC<RegisterProps> = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
           <div className="space-y-6 relative z-10">
             <Logo size="md" variant="light" />
-            <h2 className="text-3xl font-black leading-tight">Torne-se um <span className="text-[#00B050]">Embaixador</span> TILLIT.</h2>
+            <h2 className="text-3xl font-black leading-tight">Torne-se um <span className="text-[#00B050]">Embaixador</span> <span className="font-tillit">TILLIT</span>.</h2>
             <p className="text-slate-300 text-sm">Transforme sua rede de contatos em uma fonte recorrente de ganhos.</p>
           </div>
           <div className="space-y-4 relative z-10">

@@ -273,7 +273,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       <div className="space-y-6 relative z-10">
         <Logo size="md" variant="light" />
         <h2 className="text-2xl sm:text-3xl font-black leading-tight">
-          Torne-se um <span className="text-[#00B050]">Embaixador</span> TILLIT.
+          Torne-se um <span className="text-[#00B050]">Embaixador</span> <span className="font-tillit">TILLIT</span>.
         </h2>
         <p className="text-slate-300 text-sm">Transforme sua rede de contatos em uma fonte recorrente de ganhos.</p>
       </div>
@@ -427,7 +427,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <div className="lg:hidden py-6 px-4 bg-[#003366]">
             <div className="flex items-center gap-2 text-white">
               <Logo size="sm" variant="light" />
-              <span className="font-bold text-lg">Parceiro+</span>
+              <span className="font-tillit font-bold text-lg">TILLIT Parceiro+</span>
             </div>
           </div>
           <FormSection />

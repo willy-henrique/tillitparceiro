@@ -14,7 +14,7 @@ const Landing: React.FC = () => {
             <div className="flex items-center gap-2 min-w-0">
               <Logo size="sm" variant="light" className="flex-shrink-0 sm:hidden" />
               <Logo size="md" variant="light" className="flex-shrink-0 hidden sm:flex" />
-              <span className="text-[#003366] font-bold text-lg sm:text-2xl tracking-tighter truncate">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
+              <span className="font-tillit text-[#003366] font-bold text-lg sm:text-2xl tracking-tighter truncate">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
             </div>
             <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
               <a href="#programa" className="hover:text-[#003366] transition-colors">O Programa</a>
@@ -62,17 +62,17 @@ const Landing: React.FC = () => {
           <div className="relative hidden md:block">
             <div className="absolute -inset-10 bg-gradient-to-tr from-[#00B050]/20 to-transparent rounded-full blur-3xl opacity-50"></div>
             <img 
-              src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+              src="https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
               className="rounded-3xl shadow-2xl relative z-10 border border-white/10"
-              alt="Team working"
+              alt="Tecnologia e pagamentos digitais"
             />
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl z-20 flex items-center gap-4">
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-[#FF8C00]">
                 <Award size={24} />
               </div>
               <div>
-                <p className="text-slate-400 text-xs font-bold uppercase">Bônus Progressivo</p>
-                <p className="text-[#003366] font-black text-xl">Top 1% Global</p>
+                <p className="text-slate-400 text-xs font-bold uppercase">Ganhos em Dinheiro</p>
+                <p className="text-[#003366] font-black text-xl">PIX Direto na Conta</p>
               </div>
             </div>
           </div>
@@ -129,16 +129,19 @@ const Landing: React.FC = () => {
             <h2 className="text-4xl md:text-5xl font-black mt-4 mb-8">Quanto mais você indica, <span className="text-orange-400 italic underline decoration-orange-400/30">mais você ganha.</span></h2>
             <div className="space-y-6">
               {[
-                { label: 'Indicações 1-5', value: 'R$ 150,00 cada', icon: <Users size={20} /> },
-                { label: 'Indicações 6-10', value: 'R$ 200,00 cada', icon: <Briefcase size={20} /> },
-                { label: 'Indicações 11+', value: 'R$ 300,00 cada', icon: <Award size={20} /> },
+                { label: 'Indicações 1-5', value: 'R$ 150,00', icon: <Users size={20} /> },
+                { label: 'Indicações 6-10', value: 'R$ 200,00', icon: <Briefcase size={20} /> },
+                { label: 'Indicações 11+', value: 'R$ 300,00', icon: <Award size={20} /> },
               ].map((tier, i) => (
                 <div key={i} className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="text-[#00B050]">{tier.icon}</div>
                     <span className="font-medium text-lg">{tier.label}</span>
                   </div>
-                  <span className="text-2xl font-black text-orange-400">{tier.value}</span>
+                  <div className="text-right">
+                    <span className="block text-2xl font-black text-orange-400">{tier.value}</span>
+                    <span className="text-[10px] text-orange-300/90 font-medium">cada</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -192,7 +195,7 @@ const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
             <Logo size="sm" variant="light" />
-            <span className="text-[#003366] font-bold text-lg">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
+            <span className="font-tillit text-[#003366] font-bold text-lg">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
           </div>
           <p className="text-slate-400 text-xs">© 2026 TILLIT Tecnologia. Todos os direitos reservados. LGPD Compliance.</p>
           <div className="flex gap-6 text-slate-400 text-sm">

@@ -202,7 +202,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2 mb-4">
             <Logo size="sm" variant="light" />
-            <span className="text-[#003366] font-black text-xl tracking-tighter uppercase">Parceiro+</span>
+            <span className="font-tillit text-[#003366] font-black text-xl tracking-tighter">TILLIT Parceiro+</span>
           </Link>
           <h1 className="text-2xl font-bold text-[#003366]">Bem-vindo de volta</h1>
           <p className="text-slate-500 text-sm">Acesse sua conta para gerenciar indicações</p>

@@ -227,7 +227,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
     <>
       <Link to="/" className="flex items-center gap-2 mb-10 text-white hover:opacity-90 transition-opacity" onClick={() => setShowMobileMenu(false)}>
         <Logo size="sm" variant="light" />
-        <span className="font-bold text-lg">Parceiro+</span>
+        <span className="font-tillit font-bold text-lg">TILLIT Parceiro+</span>
       </Link>
       <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all mb-4 font-medium text-sm" onClick={() => setShowMobileMenu(false)}>
         <ArrowLeft size={18} /> Voltar ao site
