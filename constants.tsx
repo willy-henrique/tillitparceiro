@@ -16,7 +16,7 @@ export const PARTNER_PRODUCTS = [
     id: 'hiper',
     title: 'Hiper',
     description: 'Sistema de Gestão (ERP) para o pequeno varejo. PDV, estoque, nota fiscal e mais em um só lugar.',
-    logo: 'https://www.google.com/s2/favicons?domain=hiper.com.br&sz=128',
+    logo: '/hiper-logo.png',
     href: 'https://hiper.com.br/',
   },
   {
