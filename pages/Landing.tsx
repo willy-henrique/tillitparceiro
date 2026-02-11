@@ -66,6 +66,12 @@ const Landing: React.FC = () => {
               className="rounded-3xl shadow-2xl relative z-10 border border-white/10"
               alt="Tecnologia e pagamentos digitais"
             />
+            {/* Overlay: logos Hiper e Linx na tela do notebook */}
+            <div className="absolute top-[12%] left-[22%] w-[52%] h-[38%] bg-white/95 rounded-lg shadow-xl z-20 flex items-center justify-center gap-6 px-4 py-3">
+              <img src="/hiper-logo.png" alt="Hiper" className="h-8 sm:h-10 object-contain" />
+              <div className="w-px h-8 bg-slate-200" />
+              <img src="https://www.google.com/s2/favicons?domain=linx.com.br&sz=128" alt="Linx" className="h-8 sm:h-10 object-contain" />
+            </div>
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl z-20 flex items-center gap-4">
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-[#FF8C00]">
                 <Award size={24} />
