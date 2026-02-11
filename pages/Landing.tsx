@@ -129,9 +129,9 @@ const Landing: React.FC = () => {
             <h2 className="text-4xl md:text-5xl font-black mt-4 mb-8">Quanto mais você indica, <span className="text-orange-400 italic underline decoration-orange-400/30">mais você ganha.</span></h2>
             <div className="space-y-6">
               {[
-                { label: 'Indicações 1-5', value: 'R$ 150,00', icon: <Users size={20} /> },
-                { label: 'Indicações 6-10', value: 'R$ 200,00', icon: <Briefcase size={20} /> },
-                { label: 'Indicações 11+', value: 'R$ 300,00', icon: <Award size={20} /> },
+                { label: 'Indicações 1-5', value: 'R$ 150,00 cada', icon: <Users size={20} /> },
+                { label: 'Indicações 6-10', value: 'R$ 200,00 cada', icon: <Briefcase size={20} /> },
+                { label: 'Indicações 11+', value: 'R$ 300,00 cada', icon: <Award size={20} /> },
               ].map((tier, i) => (
                 <div key={i} className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
                   <div className="flex items-center gap-4">
