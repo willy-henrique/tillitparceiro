@@ -59,11 +59,11 @@ const Landing: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="relative hidden md:block">
+          <div className="relative hidden md:block flex justify-end">
             <div className="absolute -inset-10 bg-gradient-to-tr from-[#00B050]/20 to-transparent rounded-full blur-3xl opacity-50"></div>
             <img 
               src="/hero-laptop.png" 
-              className="w-full max-w-[480px] h-auto object-contain rounded-3xl shadow-2xl relative z-10 border border-white/10"
+              className="w-full max-w-[540px] h-auto object-contain rounded-3xl shadow-2xl relative z-10 border border-transparent translate-x-16"
               alt="Tecnologia e pagamentos digitais"
             />
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl z-20 flex items-center gap-4">
