@@ -11,25 +11,27 @@ export const THEME = {
   }
 };
 
-export const MOCK_PRODUCTS = [
+export const PARTNER_PRODUCTS = [
   {
-    title: 'Tillit ERP',
-    description: 'Gestão completa e integrada para sua empresa crescer sem limites.',
-    icon: <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    id: 'hiper',
+    title: 'Hiper',
+    description: 'Sistema de Gestão (ERP) para o pequeno varejo. PDV, estoque, nota fiscal e mais em um só lugar.',
+    logo: 'https://www.google.com/s2/favicons?domain=hiper.com.br&sz=128',
+    href: 'https://hiper.com.br/',
   },
   {
-    title: 'Tillit PDV',
-    description: 'Venda rápida, segura e com controle total de estoque em tempo real.',
-    icon: <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    id: 'tef',
+    title: 'TEF',
+    description: 'Transferência Eletrônica de Fundos integrada. Meios de pagamento e maquininhas conectadas ao seu sistema.',
+    logo: null,
+    href: null,
+    icon: <path d="M21 4H3a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zM7 18v-4h2v4H7zm4 0v-4h2v4h-2zm4 0v-4h2v4h-2zm4 0h-2v-4h2v4z" />,
   },
   {
-    title: 'Tillit BI',
-    description: 'Dados transformados em inteligência estratégica para o seu negócio.',
-    icon: <path d="M12 20v-6M6 20V10M18 20V4" />
+    id: 'linx-emporio',
+    title: 'Linx Empório',
+    description: 'Soluções especializadas na gestão do varejo de proximidade. Empórios, minimercados e padarias.',
+    logo: 'https://www.google.com/s2/favicons?domain=linx.com.br&sz=128',
+    href: 'https://www.linx.com.br/blog/gestao-de-emporios/',
   },
-  {
-    title: 'Cloud Fiscal',
-    description: 'Segurança absoluta para seus documentos fiscais na nuvem.',
-    icon: <path d="M17.5 19a3.5 3.5 0 1 1-5.83-2.65 7 7 0 1 1 10.56-4.43 4.5 4.5 0 0 1-.73 8.93h-4" />
-  }
 ];

@@ -3,8 +3,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from './lib/firebase';
 import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import PainelLogin from './pages/PainelLogin';
@@ -80,8 +79,8 @@ const App: React.FC = () => {
     <HashRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login onLogin={login} />} />
-        <Route path="/registrar" element={<Register />} />
+        <Route path="/login" element={<Auth onLogin={login} />} />
+        <Route path="/registrar" element={<Auth onLogin={login} />} />
         <Route 
           path="/aguardando" 
           element={

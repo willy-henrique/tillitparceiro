@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, DollarSign, Users, Award, Briefcase, CheckCircle2 } from 'lucide-react';
-import { MOCK_PRODUCTS, THEME } from '../constants';
+import { PARTNER_PRODUCTS } from '../constants';
 import Logo from '../components/Logo';
 
 const Landing: React.FC = () => {
@@ -83,20 +83,41 @@ const Landing: React.FC = () => {
       <section id="solucoes" className="py-24 max-w-7xl mx-auto px-4">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-3xl md:text-5xl font-black text-[#003366]">O que você pode indicar?</h2>
-          <p className="text-slate-500 max-w-2xl mx-auto">Soluções robustas de TI que resolvem problemas reais. Vender Tillit é entregar valor.</p>
+          <p className="text-slate-500 max-w-2xl mx-auto">Soluções robustas de TI que resolvem problemas reais. Indique e ganhe com cada contrato fechado.</p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {MOCK_PRODUCTS.map((product, idx) => (
-            <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-100 hover:border-[#00B050]/30 hover:shadow-2xl hover:shadow-[#00B050]/5 transition-all group">
-              <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-[#003366] mb-6 group-hover:bg-[#003366] group-hover:text-white transition-colors">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  {product.icon}
-                </svg>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {PARTNER_PRODUCTS.map((product) => {
+            const CardContent = (
+              <>
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-[#003366] mb-6 group-hover:bg-[#003366] group-hover:text-white transition-colors overflow-hidden">
+                  {product.logo ? (
+                    <img src={product.logo} alt={product.title} className="w-10 h-10 object-contain" />
+                  ) : product.icon ? (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      {product.icon}
+                    </svg>
+                  ) : null}
+                </div>
+                <h3 className="text-xl font-bold text-[#003366] mb-3">{product.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{product.description}</p>
+                {product.href && (
+                  <span className="inline-flex items-center gap-1 mt-4 text-[#00B050] font-semibold text-sm group-hover:underline">
+                    Conhecer site <ChevronRight className="w-4 h-4" />
+                  </span>
+                )}
+              </>
+            );
+            const className = "bg-white p-8 rounded-3xl border border-slate-100 hover:border-[#00B050]/30 hover:shadow-2xl hover:shadow-[#00B050]/5 transition-all group h-full flex flex-col";
+            return product.href ? (
+              <a key={product.id} href={product.href} target="_blank" rel="noopener noreferrer" className={className}>
+                {CardContent}
+              </a>
+            ) : (
+              <div key={product.id} className={className}>
+                {CardContent}
               </div>
-              <h3 className="text-xl font-bold text-[#003366] mb-3">{product.title}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">{product.description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
