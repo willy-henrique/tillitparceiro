@@ -89,16 +89,16 @@ const Landing: React.FC = () => {
           {PARTNER_PRODUCTS.map((product) => {
             const CardContent = (
               <>
-                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-[#003366] mb-6 group-hover:bg-[#003366] group-hover:text-white transition-colors overflow-hidden">
+                <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center text-[#003366] mb-6 group-hover:bg-[#003366] group-hover:text-white transition-colors overflow-hidden p-2">
                   {product.logo ? (
-                    <img src={product.logo} alt={product.title} className="w-10 h-10 object-contain" />
+                    <img src={product.logo} alt={product.title} className="w-full h-full object-contain" />
                   ) : product.icon ? (
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       {product.icon}
                     </svg>
                   ) : null}
                 </div>
-                <h3 className="text-xl font-bold text-[#003366] mb-3">{product.title}</h3>
+                <h3 className="text-xl font-black text-[#003366] mb-3">{product.title}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">{product.description}</p>
                 {product.href && (
                   <span className="inline-flex items-center gap-1 mt-4 text-[#00B050] font-semibold text-sm group-hover:underline">
