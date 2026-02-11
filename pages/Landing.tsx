@@ -140,7 +140,7 @@ const Landing: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <span className="block text-2xl font-black text-orange-400">{tier.value}</span>
-                    <span className="text-[10px] text-orange-300/90 font-medium">cada</span>
+                    <span className="text-sm text-orange-300 font-medium">cada</span>
                   </div>
                 </div>
               ))}
