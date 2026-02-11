@@ -8,7 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Montserrat', 'sans-serif'],
-        tillit: ['Merriweather', 'serif'],
+        tillit: ['Inter', 'sans-serif'],
       },
     },
   },
