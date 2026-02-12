@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, DollarSign, Users, Award, Briefcase, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, Users, Award, Briefcase, CheckCircle2, X } from 'lucide-react';
 import { PARTNER_PRODUCTS } from '../constants';
 import Logo from '../components/Logo';
 
+const TERMOS_DE_USO = (
+  <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
+    <p><strong>1. Objeto.</strong> Estes Termos regem o uso da plataforma TILLIT Parceiro+, programa de indicação de parceiros da TILLIT Tecnologia.</p>
+    <p><strong>2. Cadastro e Elegibilidade.</strong> Para participar, o parceiro deve cadastrar-se com dados verdadeiros (nome, e-mail, WhatsApp, CNPJ/CPF, empresa). A TILLIT reserva-se o direito de aprovar ou recusar cadastros.</p>
+    <p><strong>3. Indicações.</strong> O parceiro indica leads qualificados. A TILLIT é responsável por negociar, fechar contrato e implantar as soluções (Hiper, TEF, Linx Empório). O bônus só é devido após pagamento da implantação pelo cliente indicado.</p>
+    <p><strong>4. Valores e Pagamento.</strong> Bônus progressivo: R$ 150,00 cada (indicações 1-5), R$ 200,00 cada (6-10), R$ 300,00 cada (11+). Pagamento via PIX em até 30 dias após confirmação.</p>
+    <p><strong>5. Conduta.</strong> O parceiro compromete-se a indicar apenas leads legítimos, sem fraude ou abuso. O descumprimento pode resultar em exclusão e perda de bônus.</p>
+    <p><strong>6. Propriedade.</strong> A plataforma, marcas e conteúdos são de propriedade da TILLIT. Uso não autorizado é vedado.</p>
+  </div>
+);
+
+const POLITICA_PRIVACIDADE = (
+  <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
+    <p>Em conformidade com a LGPD (Lei 13.709/2018), a TILLIT Tecnologia informa:</p>
+    <p><strong>Controlador:</strong> TILLIT Tecnologia.</p>
+    <p><strong>Dados coletados:</strong> nome, e-mail, telefone (WhatsApp), CPF/CNPJ, nome da empresa, dados de indicações (leads) e informações de pagamento (chave PIX).</p>
+    <p><strong>Finalidade:</strong> gestão do Programa Parceiro+, processamento de indicações, pagamento de bônus e comunicação com parceiros.</p>
+    <p><strong>Base legal:</strong> execução de contrato, legítimo interesse e consentimento quando aplicável.</p>
+    <p><strong>Compartilhamento:</strong> dados podem ser compartilhados com prestadores de serviços (ex.: processamento de pagamentos) e órgãos competentes quando exigido por lei.</p>
+    <p><strong>Direitos do titular:</strong> acesso, correção, exclusão, portabilidade e revogação do consentimento, mediante solicitação ao e-mail de privacidade.</p>
+  </div>
+);
+
 const Landing: React.FC = () => {
+  const [modal, setModal] = useState<'termos' | 'privacidade' | null>(null);
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation */}
@@ -14,7 +39,9 @@ const Landing: React.FC = () => {
             <div className="flex items-center gap-2 min-w-0">
               <Logo size="sm" variant="light" className="flex-shrink-0 sm:hidden" />
               <Logo size="md" variant="light" className="flex-shrink-0 hidden sm:flex" />
-              <span className="font-tillit text-[#003366] font-bold text-lg sm:text-2xl tracking-tighter truncate">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
+              <span className="font-tillit text-[#00B050] font-bold text-lg sm:text-2xl tracking-tighter truncate">
+                Parceiro+
+              </span>
             </div>
             <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
               <a href="#programa" className="hover:text-[#003366] transition-colors">O Programa</a>
@@ -87,11 +114,20 @@ const Landing: React.FC = () => {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {PARTNER_PRODUCTS.map((product) => {
+            const isHiper = product.id === 'hiper';
+            const logoWrapperClasses = `
+              ${isHiper ? 'w-24 h-24 p-1' : 'w-20 h-20 p-2'}
+              bg-slate-50 rounded-2xl flex items-center justify-center text-[#003366] mb-6
+              group-hover:bg-[#003366] group-hover:text-white transition-colors overflow-hidden
+            `;
+            const logoImgClasses = isHiper
+              ? 'w-full h-full object-contain scale-110'
+              : 'w-full h-full object-contain';
             const CardContent = (
               <>
-                <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center text-[#003366] mb-6 group-hover:bg-[#003366] group-hover:text-white transition-colors overflow-hidden p-2">
+                <div className={logoWrapperClasses}>
                   {product.logo ? (
-                    <img src={product.logo} alt={product.title} className="w-full h-full object-contain" />
+                    <img src={product.logo} alt={product.title} className={logoImgClasses} />
                   ) : product.icon ? (
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       {product.icon}
@@ -195,15 +231,32 @@ const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
             <Logo size="sm" variant="light" />
-            <span className="font-tillit text-[#003366] font-bold text-lg">TILLIT <span className="text-[#00B050]">Parceiro+</span></span>
+            <span className="font-tillit text-[#00B050] font-bold text-lg">Parceiro+</span>
           </div>
           <p className="text-slate-400 text-xs">© 2026 TILLIT Tecnologia. Todos os direitos reservados. LGPD Compliance.</p>
           <div className="flex gap-6 text-slate-400 text-sm">
-            <a href="#" className="hover:text-[#003366]">Privacidade</a>
-            <a href="#" className="hover:text-[#003366]">Termos de Uso</a>
+            <button type="button" onClick={() => setModal('privacidade')} className="hover:text-[#003366] transition-colors">Privacidade</button>
+            <button type="button" onClick={() => setModal('termos')} className="hover:text-[#003366] transition-colors">Termos de Uso</button>
           </div>
         </div>
       </footer>
+
+      {/* Modal Termos / Privacidade */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <h3 className="font-bold text-lg text-[#003366]">{modal === 'termos' ? 'Termos de Uso' : 'Política de Privacidade'}</h3>
+              <button type="button" onClick={() => setModal(null)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="px-6 py-5 overflow-y-auto flex-1">
+              {modal === 'termos' ? TERMOS_DE_USO : POLITICA_PRIVACIDADE}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
