@@ -59,20 +59,20 @@ const Landing: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <header className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 bg-pattern relative overflow-hidden">
+      <header className="pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 px-4 bg-pattern relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00B050]/10 to-transparent pointer-events-none"></div>
-        <div className="max-w-7xl mx-auto relative z-10 grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8 animate-fade-in">
+        <div className="max-w-7xl mx-auto relative z-10 grid md:grid-cols-2 gap-10 items-center">
+          <div className="space-y-6 animate-fade-in">
             <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-1.5 rounded-full border border-white/20">
               <span className="text-[#00B050] font-bold text-xs uppercase tracking-widest">Tecnologia feita para pessoas</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold text-white leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
               Sua indicação vale <span className="text-[#00B050]">dinheiro vivo.</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-lg leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-md leading-relaxed">
               Ganhe até <strong className="text-white">R$ 300,00 por contrato</strong> fechado. Faça parte do ecossistema que mais cresce no Brasil.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/registrar" className="bg-[#00B050] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-600 transition-all flex items-center justify-center gap-2 group shadow-xl shadow-green-900/40">
                 Seja um Parceiro+ <ChevronRight className="group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -88,9 +88,9 @@ const Landing: React.FC = () => {
           </div>
           <div className="relative hidden md:block flex justify-end">
             <div className="absolute -inset-10 bg-gradient-to-tr from-[#00B050]/20 to-transparent rounded-full blur-3xl opacity-50"></div>
-            <img 
-              src="/hero-laptop.png" 
-              className="w-full max-w-[540px] h-auto object-contain rounded-3xl shadow-2xl relative z-10 border border-transparent translate-x-16"
+            <img
+              src="/hero-laptop.png"
+              className="w-full max-w-[500px] h-auto object-contain rounded-3xl shadow-2xl relative z-10 border border-transparent translate-x-10"
               alt="Tecnologia e pagamentos digitais"
             />
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl z-20 flex items-center gap-4">
