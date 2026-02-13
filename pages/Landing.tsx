@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Users, Award, Briefcase, CheckCircle2, X } from 'lucide-react';
+import { ChevronRight, Users, Award, Briefcase, CheckCircle2, X, CreditCard } from 'lucide-react';
 import { PARTNER_PRODUCTS } from '../constants';
 import Logo from '../components/Logo';
 
@@ -9,7 +9,7 @@ const TERMOS_DE_USO = (
     <p><strong>1. Objeto.</strong> Estes Termos regem o uso da plataforma TILLIT Parceiro+, programa de indicação de parceiros da TILLIT Tecnologia.</p>
     <p><strong>2. Cadastro e Elegibilidade.</strong> Para participar, o parceiro deve cadastrar-se com dados verdadeiros (nome, e-mail, WhatsApp, CNPJ/CPF, empresa). A TILLIT reserva-se o direito de aprovar ou recusar cadastros.</p>
     <p><strong>3. Indicações.</strong> O parceiro indica leads qualificados. A TILLIT é responsável por negociar, fechar contrato e implantar as soluções (Hiper, TEF, Linx Empório). O bônus só é devido após pagamento da implantação pelo cliente indicado.</p>
-    <p><strong>4. Valores e Pagamento.</strong> Bônus progressivo: R$ 150,00 cada (indicações 1-5), R$ 200,00 cada (6-10), R$ 300,00 cada (11+). Pagamento via PIX em até 30 dias após confirmação.</p>
+    <p><strong>4. Valores e Pagamento.</strong> Indicação TEF: R$ 50,00 cada. Bônus progressivo: R$ 150,00 cada (indicações 1-5), R$ 200,00 cada (6-10), R$ 300,00 cada (11+). Pagamento via PIX em até 30 dias após confirmação.</p>
     <p><strong>5. Conduta.</strong> O parceiro compromete-se a indicar apenas leads legítimos, sem fraude ou abuso. O descumprimento pode resultar em exclusão e perda de bônus.</p>
     <p><strong>6. Propriedade.</strong> A plataforma, marcas e conteúdos são de propriedade da TILLIT. Uso não autorizado é vedado.</p>
   </div>
@@ -169,6 +169,7 @@ const Landing: React.FC = () => {
             <h2 className="text-4xl md:text-5xl font-black mt-4 mb-8">Quanto mais você indica, <span className="text-orange-400 italic underline decoration-orange-400/30">mais você ganha.</span></h2>
             <div className="space-y-6">
               {[
+                { label: 'Indicação TEF', value: 'R$ 50,00', icon: <CreditCard size={20} /> },
                 { label: 'Indicações 1-5', value: 'R$ 150,00', icon: <Users size={20} /> },
                 { label: 'Indicações 6-10', value: 'R$ 200,00', icon: <Briefcase size={20} /> },
                 { label: 'Indicações 11+', value: 'R$ 300,00', icon: <Award size={20} /> },
