@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import PainelLogin from './pages/PainelLogin';
 import AguardandoAprovacao from './pages/AguardandoAprovacao';
+import SupportChat from './components/SupportChat';
 import { User, AuthState } from './types';
 
 const App: React.FC = () => {
@@ -77,6 +78,7 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
+      <SupportChat />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Auth onLogin={login} />} />
