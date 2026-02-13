@@ -168,10 +168,10 @@ const SupportChat: React.FC = () => {
         type="button"
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-[#003366] text-white px-5 py-3 rounded-full font-semibold text-sm shadow-xl shadow-[#003366]/30 hover:bg-[#002244] hover:scale-105 active:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-[#00B050] focus:ring-offset-2"
-        aria-label="Abrir suporte"
+        aria-label="Abrir dúvidas"
       >
         <MessageCircle size={20} />
-        Suporte
+        Dúvidas
       </button>
 
       {isOpen && (
@@ -193,7 +193,7 @@ const SupportChat: React.FC = () => {
               <Bot size={22} />
             </div>
             <div>
-              <h3 className="font-bold text-lg">Suporte Parceiro+</h3>
+              <h3 className="font-bold text-lg">Dúvidas Parceiro+</h3>
               <p className="text-white/80 text-xs">Assistente com IA • TILLIT Tecnologia</p>
             </div>
           </div>
