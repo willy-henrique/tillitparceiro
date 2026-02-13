@@ -405,6 +405,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             <input type="checkbox" required checked={formData.terms} onChange={(e) => setFormData({ ...formData, terms: e.target.checked })} className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" />
             <span className="text-xs text-slate-500 leading-relaxed">Li e aceito os <a href="#" className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a LGPD.</span>
           </label>
+          <p className="text-xs font-bold text-slate-600 bg-amber-50 border border-amber-200 px-4 py-3 rounded-xl">
+            Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
+          </p>
           <button type="submit" disabled={loading} className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed">
             {loading ? 'Enviando...' : 'Solicitar Acesso'} <ShieldCheck size={18} />
           </button>

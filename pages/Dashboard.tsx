@@ -693,13 +693,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                 </div>
               </div>
               {submitError && <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{submitError}</p>}
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                <p className="text-sm font-bold text-slate-800 leading-relaxed flex items-center gap-2">
+                  <Bell size={18} className="text-amber-600 flex-shrink-0" />
+                  Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
+                </p>
+              </div>
               <div className="bg-green-50 p-4 rounded-xl border border-green-100">
                 <p className="text-xs text-green-700 leading-relaxed">
                   <span className="font-bold">Dica:</span> Quanto mais informações você fornecer, mais rápida será nossa abordagem comercial.
                 </p>
               </div>
               <button type="submit" disabled={loading} className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed">
-                {loading ? 'Cadastrando...' : 'Confirmar Indicação'} <ChevronRight size={18} />
+                {loading ? 'Cadastrando...' : 'Enviar Indicação'} <ChevronRight size={18} />
               </button>
             </form>
           </div>

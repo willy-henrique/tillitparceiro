@@ -47,6 +47,7 @@ const Landing: React.FC = () => {
               <a href="#programa" className="hover:text-[#003366] transition-colors">O Programa</a>
               <a href="#solucoes" className="hover:text-[#003366] transition-colors">Soluções</a>
               <a href="#ganhos" className="hover:text-[#003366] transition-colors">Ganhos</a>
+              <a href="#faq" className="hover:text-[#003366] transition-colors">FAQ</a>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               <Link to="/login" className="text-xs sm:text-sm font-semibold text-[#003366] hover:underline py-2">Entrar</Link>
@@ -69,8 +70,11 @@ const Landing: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
               Sua indicação vale <span className="text-[#00B050]">dinheiro vivo.</span>
             </h1>
+            <p className="text-base sm:text-lg text-[#00B050]/95 font-medium max-w-lg">
+              Indicações válidas por mês — sem acumular para os meses seguintes!
+            </p>
             <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-md leading-relaxed">
-              Ganhe até <strong className="text-white">R$ 300,00 por contrato</strong> fechado. Faça parte do ecossistema que mais cresce no Brasil.
+              Ganhe até <strong className="text-white">R$ 300,00 por contrato</strong> fechado. Indique, gere valor e cresça com a gente.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/registrar" className="bg-[#00B050] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-600 transition-all flex items-center justify-center gap-2 group shadow-xl shadow-green-900/40">
@@ -110,7 +114,7 @@ const Landing: React.FC = () => {
       <section id="solucoes" className="py-24 max-w-7xl mx-auto px-4">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-3xl md:text-5xl font-black text-[#003366]">O que você pode indicar?</h2>
-          <p className="text-slate-500 max-w-2xl mx-auto">Soluções robustas de TI que resolvem problemas reais. Indique e ganhe com cada contrato fechado.</p>
+          <p className="text-slate-500 max-w-2xl mx-auto">Indique empresas, receba sua premiação — indicações válidas apenas para o mês corrente.</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {PARTNER_PRODUCTS.map((product) => {
@@ -155,6 +159,9 @@ const Landing: React.FC = () => {
             );
           })}
         </div>
+        <p className="text-center text-slate-500 text-sm mt-10 max-w-3xl mx-auto">
+          Soluções para: Mercadinho, Material de Construção, Açougue, Padaria, Ferragista, Loja de Cosméticos
+        </p>
       </section>
 
       {/* Earnings / Rules */}
@@ -222,6 +229,31 @@ const Landing: React.FC = () => {
                 </div>
               </li>
             </ul>
+            <div className="mt-8 p-6 bg-amber-50 border border-amber-200 rounded-2xl">
+              <p className="font-bold text-[#003366] flex items-center gap-2 mb-3">
+                <span aria-hidden>📌</span> Importante – Validade das Indicações
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600 leading-relaxed">
+                <li>• Cada indicação é válida apenas no mês em que foi enviada.</li>
+                <li>• Indicações não são acumulativas entre meses.</li>
+                <li>• Envie sua indicação dentro do mês corrente para que seja considerada.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-24 max-w-3xl mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-black text-[#003366] text-center mb-12">Perguntas Frequentes</h2>
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <p className="font-bold text-[#003366] mb-2">As indicações acumulam mês a mês?</p>
+            <p className="text-slate-600 text-sm leading-relaxed">Não — cada indicação é válida somente no mês em que foi registrada.</p>
+          </div>
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <p className="font-bold text-[#003366] mb-2">E se eu esquecer de enviar uma indicação em um mês?</p>
+            <p className="text-slate-600 text-sm leading-relaxed">Você deve registrar novamente no mês seguinte para que seja válida.</p>
           </div>
         </div>
       </section>

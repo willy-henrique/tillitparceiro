@@ -323,6 +323,9 @@ const Register: React.FC<RegisterProps> = () => {
             </div>
 
             {error && <p className="text-sm text-red-500">{error}</p>}
+            <p className="text-xs font-bold text-slate-600 bg-amber-50 border border-amber-200 px-4 py-3 rounded-xl">
+              Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
+            </p>
             <button type="submit" disabled={loading} className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed">
               {loading ? 'Enviando...' : 'Solicitar Acesso'} <ShieldCheck size={18} />
             </button>
