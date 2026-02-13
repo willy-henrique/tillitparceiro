@@ -70,9 +70,6 @@ const Landing: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
               Sua indicação vale <span className="text-[#00B050]">dinheiro vivo.</span>
             </h1>
-            <p className="text-base sm:text-lg text-[#00B050]/95 font-medium max-w-lg">
-              Indicações válidas por mês — sem acumular para os meses seguintes!
-            </p>
             <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-md leading-relaxed">
               Ganhe até <strong className="text-white">R$ 300,00 por contrato</strong> fechado. Indique, gere valor e cresça com a gente.
             </p>
@@ -249,7 +246,7 @@ const Landing: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
             <p className="font-bold text-[#003366] mb-2">As indicações acumulam mês a mês?</p>
-            <p className="text-slate-600 text-sm leading-relaxed">Não — cada indicação é válida somente no mês em que foi registrada.</p>
+            <p className="text-slate-600 text-sm leading-relaxed">Não, cada indicação é válida somente no mês em que foi registrada.</p>
           </div>
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
             <p className="font-bold text-[#003366] mb-2">E se eu esquecer de enviar uma indicação em um mês?</p>
