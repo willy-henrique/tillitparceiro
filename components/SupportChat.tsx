@@ -178,21 +178,25 @@ const SupportChat: React.FC = () => {
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           aria-hidden
         />
       )}
 
-      {/* Painel: mobile = tela cheia | desktop = card no canto */}
+      {/* Painel: mobile = tela cheia | desktop = card no canto. z-[100] acima da nav do site. */}
       <div
-        className={`fixed z-50 flex flex-col bg-white border border-slate-200 transition-all duration-300 ease-out
+        className={`fixed z-[100] flex flex-col bg-white border border-slate-200 transition-all duration-300 ease-out
           inset-0 max-h-[100dvh] rounded-none
           sm:inset-auto sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto sm:w-full sm:max-w-[420px] sm:h-[560px] sm:max-h-[85vh] sm:rounded-2xl sm:shadow-2xl
           ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-[0.98] pointer-events-none'}`}
       >
-        <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 bg-[#003366] text-white rounded-t-2xl shrink-0 min-h-[56px]">
-          <div className="flex items-center gap-3 min-w-0">
+        {/* Header com safe-area no topo (notch) para o X sempre visível no mobile */}
+        <div
+          className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 bg-[#003366] text-white rounded-t-2xl shrink-0 min-h-[56px]"
+          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+        >
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
               <Bot size={20} className="sm:w-[22px] sm:h-[22px]" />
             </div>
@@ -204,10 +208,10 @@ const SupportChat: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-white/25 text-white hover:bg-white/40 active:bg-white/50 border border-white/30 transition-colors touch-manipulation"
+            className="shrink-0 min-h-[48px] min-w-[48px] flex items-center justify-center rounded-full bg-white/30 text-white hover:bg-white/50 active:bg-white/60 border-2 border-white/50 transition-colors touch-manipulation -mr-1"
             aria-label="Fechar"
           >
-            <X size={24} strokeWidth={2.5} />
+            <X size={26} strokeWidth={2.5} />
           </button>
         </div>
 
