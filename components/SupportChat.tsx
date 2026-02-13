@@ -164,14 +164,16 @@ const SupportChat: React.FC = () => {
 
   return (
     <>
+      {/* Botão: canto inferior direito, área de toque ≥44px, safe-area em mobile */}
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-[#003366] text-white px-5 py-3 rounded-full font-semibold text-sm shadow-xl shadow-[#003366]/30 hover:bg-[#002244] hover:scale-105 active:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-[#00B050] focus:ring-offset-2"
+        className="fixed z-40 flex items-center gap-2 bg-[#003366] text-white rounded-full font-semibold shadow-xl shadow-[#003366]/30 hover:bg-[#002244] active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-[#00B050] focus:ring-offset-2 text-sm min-h-[48px] px-4 py-3 sm:px-5 sm:py-3 touch-manipulation"
+        style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))', right: 'max(1rem, env(safe-area-inset-right))' }}
         aria-label="Abrir dúvidas"
       >
         <MessageCircle size={20} />
-        Dúvidas
+        <span>Dúvidas</span>
       </button>
 
       {isOpen && (
@@ -182,74 +184,76 @@ const SupportChat: React.FC = () => {
         />
       )}
 
+      {/* Painel: mobile = tela cheia | desktop = card no canto */}
       <div
-        className={`fixed bottom-6 right-6 z-50 w-full max-w-md sm:max-w-[420px] h-[560px] max-h-[85vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col transition-all duration-300 ${
-          isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
-        }`}
+        className={`fixed z-50 flex flex-col bg-white border border-slate-200 transition-all duration-300 ease-out
+          inset-0 max-h-[100dvh] rounded-none
+          sm:inset-auto sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto sm:w-full sm:max-w-[420px] sm:h-[560px] sm:max-h-[85vh] sm:rounded-2xl sm:shadow-2xl
+          ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-[0.98] pointer-events-none'}`}
       >
-        <div className="flex items-center justify-between px-5 py-4 bg-[#003366] text-white rounded-t-2xl shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <Bot size={22} />
+        <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 bg-[#003366] text-white rounded-t-2xl shrink-0 min-h-[56px]">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <Bot size={20} className="sm:w-[22px] sm:h-[22px]" />
             </div>
-            <div>
-              <h3 className="font-bold text-lg">Dúvidas Parceiro+</h3>
-              <p className="text-white/80 text-xs">Assistente com IA • TILLIT Tecnologia</p>
+            <div className="min-w-0">
+              <h3 className="font-bold text-base sm:text-lg truncate">Dúvidas Parceiro+</h3>
+              <p className="text-white/80 text-xs truncate">Assistente com IA • TILLIT</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="p-2 rounded-full hover:bg-white/20 transition-colors"
+            className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation"
             aria-label="Fechar"
           >
             <X size={22} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 sm:p-4 space-y-3 sm:space-y-4 bg-slate-50/50">
           {messages.length === 0 && (
-            <div className="text-center py-8 text-slate-500 text-sm">
-              <MessageCircle size={40} className="mx-auto mb-3 text-[#003366]/40" />
+            <div className="text-center py-6 sm:py-8 text-slate-500 text-sm px-2">
+              <MessageCircle size={36} className="mx-auto mb-2 sm:mb-3 text-[#003366]/40 sm:w-10 sm:h-10" />
               <p className="font-semibold text-[#003366]">Como podemos ajudar?</p>
-              <p className="mt-1 max-w-[260px] mx-auto">
-                Tire dúvidas sobre o programa de indicação, bônus, cadastro e soluções. Respostas alinhadas ao Parceiro+.
+              <p className="mt-1 max-w-[260px] mx-auto text-xs sm:text-sm">
+                Tire dúvidas sobre o programa de indicação, bônus, cadastro e soluções.
               </p>
             </div>
           )}
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+              className={`flex gap-2 sm:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 ${
                   msg.role === 'user' ? 'bg-[#00B050]' : 'bg-[#003366]'
                 }`}
               >
-                {msg.role === 'user' ? <User size={16} className="text-white" /> : <Bot size={16} className="text-white" />}
+                {msg.role === 'user' ? <User size={14} className="sm:w-4 sm:h-4 text-white" /> : <Bot size={14} className="sm:w-4 sm:h-4 text-white" />}
               </div>
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
+                className={`max-w-[85%] min-w-0 rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm ${
                   msg.role === 'user'
                     ? 'bg-[#00B050] text-white rounded-br-md'
                     : 'bg-white text-slate-700 border border-slate-200 rounded-bl-md shadow-sm'
                 }`}
               >
-                <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                <p className="leading-relaxed whitespace-pre-wrap break-words">{msg.content}</p>
               </div>
             </div>
           ))}
           {isLoading && (
-            <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#003366] flex items-center justify-center shrink-0">
-                <Bot size={16} className="text-white" />
+            <div className="flex gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#003366] flex items-center justify-center shrink-0">
+                <Bot size={14} className="sm:w-4 sm:h-4 text-white" />
               </div>
-              <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+              <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-md px-3 sm:px-4 py-2.5 sm:py-3 shadow-sm">
                 <div className="flex gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             </div>
@@ -257,7 +261,10 @@ const SupportChat: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-4 border-t border-slate-200 bg-white rounded-b-2xl shrink-0">
+        <div
+          className="p-3 sm:p-4 border-t border-slate-200 bg-white rounded-b-2xl shrink-0"
+          style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+        >
           <div className="flex gap-2 items-end">
             <textarea
               ref={inputRef}
@@ -266,14 +273,14 @@ const SupportChat: React.FC = () => {
               onKeyDown={handleKeyDown}
               placeholder="Sua dúvida sobre o Parceiro+..."
               rows={1}
-              className="flex-1 resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B050]/30 focus:border-[#00B050] transition-all min-h-[44px] max-h-32"
+              className="flex-1 resize-none rounded-xl border border-slate-200 px-3 py-2.5 sm:px-4 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B050]/30 focus:border-[#00B050] transition-all min-h-[44px] max-h-28 sm:max-h-32 touch-manipulation"
               disabled={isLoading}
             />
             <button
               type="button"
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="shrink-0 w-12 h-12 rounded-xl bg-[#00B050] text-white flex items-center justify-center hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="shrink-0 min-h-[44px] min-w-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#00B050] text-white flex items-center justify-center hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all touch-manipulation"
               aria-label="Enviar"
             >
               <Send size={20} />
