@@ -204,10 +204,10 @@ const SupportChat: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation"
+            className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-white/25 text-white hover:bg-white/40 active:bg-white/50 border border-white/30 transition-colors touch-manipulation"
             aria-label="Fechar"
           >
-            <X size={22} />
+            <X size={24} strokeWidth={2.5} />
           </button>
         </div>
 
