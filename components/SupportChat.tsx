@@ -79,6 +79,12 @@ const SupportChat: React.FC = () => {
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 
+  // Bot: ao atualizar/recarregar a página, conversa sempre começa vazia (não persistir)
+  useEffect(() => {
+    sessionStorage.removeItem('parceiro_support_chat');
+    localStorage.removeItem('parceiro_support_chat');
+  }, []);
+
   useEffect(() => {
     if (isOpen) scrollToBottom();
   }, [isOpen, messages]);
