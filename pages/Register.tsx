@@ -15,8 +15,6 @@ const Register: React.FC<RegisterProps> = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
-  const unlockField = (field: string) => setUnlockedFields(prev => (prev[field] ? prev : { ...prev, [field]: true }));
   const [formData, setFormData] = useState({
     companyName: '',
     name: '',
@@ -236,7 +234,7 @@ const Register: React.FC<RegisterProps> = () => {
           </div>
         </div>
 
-        <div className="md:col-span-3 p-6 sm:p-10 space-y-6 sm:space-y-8 overflow-y-auto min-h-0 flex flex-col">
+        <div className="md:col-span-3 p-6 sm:p-10 space-y-6 sm:space-y-8 md:overflow-y-auto min-h-0 flex flex-col">
           <div>
             <h1 className="text-2xl font-bold text-[#003366]">Criar Conta de Parceiro</h1>
             <p className="text-slate-500 text-sm">Preencha os dados abaixo ou use o Google para começar</p>
@@ -284,9 +282,6 @@ const Register: React.FC<RegisterProps> = () => {
                   value={formData.companyName}
                   onChange={(e) => setFormData({...formData, companyName: e.target.value})}
                   placeholder="Nome fantasia ou razão social"
-                  readOnly={!unlockedFields['companyName']}
-                  onTouchStart={() => unlockField('companyName')}
-                  onFocus={() => unlockField('companyName')}
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
@@ -297,9 +292,6 @@ const Register: React.FC<RegisterProps> = () => {
                   autoComplete="name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  readOnly={!unlockedFields['name']}
-                  onTouchStart={() => unlockField('name')}
-                  onFocus={() => unlockField('name')}
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
@@ -311,9 +303,6 @@ const Register: React.FC<RegisterProps> = () => {
                   inputMode="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  readOnly={!unlockedFields['email']}
-                  onTouchStart={() => unlockField('email')}
-                  onFocus={() => unlockField('email')}
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
@@ -327,9 +316,6 @@ const Register: React.FC<RegisterProps> = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     placeholder="(00) 00000-0000"
-                    readOnly={!unlockedFields['phone']}
-                    onTouchStart={() => unlockField('phone')}
-                    onFocus={() => unlockField('phone')}
                     className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                   />
                 </div>
@@ -340,9 +326,6 @@ const Register: React.FC<RegisterProps> = () => {
                     autoComplete="new-password"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    readOnly={!unlockedFields['password']}
-                    onTouchStart={() => unlockField('password')}
-                    onFocus={() => unlockField('password')}
                     className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                   />
                 </div>

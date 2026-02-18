@@ -46,8 +46,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   } | null>(null);
   const [googleUserPendingPhone, setGoogleUserPendingPhone] = useState<{ name: string; email: string } | null>(null);
   const [phoneInput, setPhoneInput] = useState('');
-  const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
-  const unlockField = (field: string) => setUnlockedFields(prev => (prev[field] ? prev : { ...prev, [field]: true }));
 
   const handleGoogleAuth = async () => {
     setLoadingGoogle(true);
@@ -399,28 +397,56 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 value={formData.companyName}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                 placeholder="Nome fantasia ou razão social"
-                readOnly={!unlockedFields['companyName']}
-                onTouchStart={() => unlockField('companyName')}
-                onFocus={() => unlockField('companyName')}
                 className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome Completo</label>
-              <input type="text" required autoComplete="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} readOnly={!unlockedFields['name']} onTouchStart={() => unlockField('name')} onFocus={() => unlockField('name')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+              <input
+                type="text"
+                required
+                autoComplete="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+              />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">E-mail Profissional</label>
-              <input type="email" required autoComplete="email" inputMode="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} readOnly={!unlockedFields['email']} onTouchStart={() => unlockField('email')} onFocus={() => unlockField('email')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                inputMode="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Telefone/WhatsApp</label>
-                <input type="tel" required autoComplete="tel" inputMode="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(00) 00000-0000" readOnly={!unlockedFields['phone']} onTouchStart={() => unlockField('phone')} onFocus={() => unlockField('phone')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+                <input
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  inputMode="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="(00) 00000-0000"
+                  className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+                />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Senha</label>
-                <input type="password" required autoComplete="new-password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} readOnly={!unlockedFields['password']} onTouchStart={() => unlockField('password')} onFocus={() => unlockField('password')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+                <input
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+                />
               </div>
             </div>
           </div>
@@ -449,7 +475,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         <div className="hidden lg:block lg:col-span-2">
           <PromoSection />
         </div>
-        <div className="lg:col-span-3 overflow-y-auto min-h-0 flex flex-col">
+        <div className="lg:col-span-3 lg:overflow-y-auto min-h-0 flex flex-col">
           <div className="lg:hidden py-6 px-4 bg-[#003366]">
             <div className="flex items-center gap-2 text-white">
               <Logo size="sm" variant="light" />
