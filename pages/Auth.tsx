@@ -46,6 +46,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   } | null>(null);
   const [googleUserPendingPhone, setGoogleUserPendingPhone] = useState<{ name: string; email: string } | null>(null);
   const [phoneInput, setPhoneInput] = useState('');
+  const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
+  const unlockField = (field: string) => setUnlockedFields(prev => (prev[field] ? prev : { ...prev, [field]: true }));
 
   const handleGoogleAuth = async () => {
     setLoadingGoogle(true);
@@ -370,7 +372,24 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </button>
         </form>
       ) : (
-        <form onSubmit={handleRegisterSubmit} className="space-y-4 flex-1">
+        <form
+          onSubmit={handleRegisterSubmit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              const target = e.target as HTMLElement;
+              if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                e.preventDefault();
+                const form = target.form;
+                if (form) {
+                  const inputs = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([type="checkbox"]):not([type="submit"]):not([type="button"]), textarea'));
+                  const i = inputs.indexOf(target as HTMLInputElement);
+                  if (i >= 0 && i < inputs.length - 1) inputs[i + 1].focus();
+                }
+              }
+            }
+          }}
+          className="space-y-4 flex-1"
+        >
           <div className="grid gap-4">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome da Empresa</label>
@@ -380,31 +399,34 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 value={formData.companyName}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                 placeholder="Nome fantasia ou razão social"
+                readOnly={!unlockedFields['companyName']}
+                onTouchStart={() => unlockField('companyName')}
+                onFocus={() => unlockField('companyName')}
                 className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome Completo</label>
-              <input type="text" required autoComplete="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+              <input type="text" required autoComplete="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} readOnly={!unlockedFields['name']} onTouchStart={() => unlockField('name')} onFocus={() => unlockField('name')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">E-mail Profissional</label>
-              <input type="email" required autoComplete="email" inputMode="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+              <input type="email" required autoComplete="email" inputMode="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} readOnly={!unlockedFields['email']} onTouchStart={() => unlockField('email')} onFocus={() => unlockField('email')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Telefone/WhatsApp</label>
-                <input type="tel" required autoComplete="tel" inputMode="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(00) 00000-0000" className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+                <input type="tel" required autoComplete="tel" inputMode="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(00) 00000-0000" readOnly={!unlockedFields['phone']} onTouchStart={() => unlockField('phone')} onFocus={() => unlockField('phone')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Senha</label>
-                <input type="password" required autoComplete="new-password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+                <input type="password" required autoComplete="new-password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} readOnly={!unlockedFields['password']} onTouchStart={() => unlockField('password')} onFocus={() => unlockField('password')} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
               </div>
             </div>
           </div>
           <label className="flex gap-3 cursor-pointer group bg-slate-50 p-4 rounded-xl">
             <input type="checkbox" required checked={formData.terms} onChange={(e) => setFormData({ ...formData, terms: e.target.checked })} className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" />
-            <span className="text-xs text-slate-500 leading-relaxed">Li e aceito os <a href="#termos" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a LGPD.</span>
+            <span className="text-xs text-slate-500 leading-relaxed">Li e aceito os <a href="javascript:void(0)" role="button" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a LGPD.</span>
           </label>
           <p className="text-xs font-bold text-slate-600 bg-amber-50 border border-amber-200 px-4 py-3 rounded-xl">
             Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.

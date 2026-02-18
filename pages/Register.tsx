@@ -15,6 +15,8 @@ const Register: React.FC<RegisterProps> = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
+  const unlockField = (field: string) => setUnlockedFields(prev => (prev[field] ? prev : { ...prev, [field]: true }));
   const [formData, setFormData] = useState({
     companyName: '',
     name: '',
@@ -255,7 +257,24 @@ const Register: React.FC<RegisterProps> = () => {
             <div className="relative flex justify-center text-xs uppercase tracking-widest"><span className="bg-white px-4 text-slate-400">ou com formulário</span></div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                  e.preventDefault();
+                  const form = target.form;
+                  if (form) {
+                    const inputs = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([type="checkbox"]):not([type="submit"]):not([type="button"]), textarea'));
+                    const i = inputs.indexOf(target as HTMLInputElement);
+                    if (i >= 0 && i < inputs.length - 1) inputs[i + 1].focus();
+                  }
+                }
+              }
+            }}
+            className="space-y-4"
+          >
             <div className="grid gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome da Empresa</label>
@@ -265,6 +284,9 @@ const Register: React.FC<RegisterProps> = () => {
                   value={formData.companyName}
                   onChange={(e) => setFormData({...formData, companyName: e.target.value})}
                   placeholder="Nome fantasia ou razão social"
+                  readOnly={!unlockedFields['companyName']}
+                  onTouchStart={() => unlockField('companyName')}
+                  onFocus={() => unlockField('companyName')}
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
@@ -275,6 +297,9 @@ const Register: React.FC<RegisterProps> = () => {
                   autoComplete="name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  readOnly={!unlockedFields['name']}
+                  onTouchStart={() => unlockField('name')}
+                  onFocus={() => unlockField('name')}
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
@@ -286,6 +311,9 @@ const Register: React.FC<RegisterProps> = () => {
                   inputMode="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  readOnly={!unlockedFields['email']}
+                  onTouchStart={() => unlockField('email')}
+                  onFocus={() => unlockField('email')}
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
@@ -299,6 +327,9 @@ const Register: React.FC<RegisterProps> = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     placeholder="(00) 00000-0000"
+                    readOnly={!unlockedFields['phone']}
+                    onTouchStart={() => unlockField('phone')}
+                    onFocus={() => unlockField('phone')}
                     className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                   />
                 </div>
@@ -309,6 +340,9 @@ const Register: React.FC<RegisterProps> = () => {
                     autoComplete="new-password"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    readOnly={!unlockedFields['password']}
+                    onTouchStart={() => unlockField('password')}
+                    onFocus={() => unlockField('password')}
                     className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                   />
                 </div>
@@ -324,7 +358,7 @@ const Register: React.FC<RegisterProps> = () => {
                   className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" 
                 />
                 <span className="text-xs text-slate-500 leading-relaxed group-hover:text-slate-700 transition-colors">
-                  Li e aceito os <a href="#termos" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a política de tratamento de dados conforme a LGPD.
+                  Li e aceito os <a href="javascript:void(0)" role="button" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a política de tratamento de dados conforme a LGPD.
                 </span>
               </label>
             </div>
