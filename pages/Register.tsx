@@ -6,6 +6,10 @@ import { auth } from '../lib/firebase';
 import { createPartnerRequest, createPartnerRequestFromGoogle, getUserByEmail } from '../lib/users';
 import Logo from '../components/Logo';
 
+const isTouchDevice =
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || (navigator as unknown as { maxTouchPoints?: number }).maxTouchPoints! > 0);
+
 interface RegisterProps {
   onRegister?: (user: unknown) => void;
 }
@@ -200,7 +204,7 @@ const Register: React.FC<RegisterProps> = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center py-4 px-4 bg-slate-50 bg-pattern overflow-y-auto">
+    <div className="min-h-screen flex flex-col items-center py-4 px-4 bg-slate-50 bg-pattern">
       <div className="max-w-2xl w-full grid md:grid-cols-5 bg-white rounded-2xl sm:rounded-3xl shadow-2xl relative min-h-0 md:overflow-hidden">
         <Link to="/" className="absolute top-4 left-4 z-20 inline-flex items-center gap-2 text-slate-500 hover:text-[#003366] transition-colors text-sm font-medium">
           <ArrowLeft size={18} /> Voltar
@@ -258,13 +262,18 @@ const Register: React.FC<RegisterProps> = () => {
           <form
             onSubmit={handleSubmit}
             onKeyDown={(e) => {
+              if (isTouchDevice) return;
               if (e.key === 'Enter') {
                 const target = e.target as HTMLElement;
                 if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
                   e.preventDefault();
                   const form = target.form;
                   if (form) {
-                    const inputs = Array.from(form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([type="checkbox"]):not([type="submit"]):not([type="button"]), textarea'));
+                    const inputs = Array.from(
+                      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+                        'input:not([type="checkbox"]):not([type="submit"]):not([type="button"]), textarea',
+                      ),
+                    );
                     const i = inputs.indexOf(target as HTMLInputElement);
                     if (i >= 0 && i < inputs.length - 1) inputs[i + 1].focus();
                   }

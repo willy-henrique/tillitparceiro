@@ -12,6 +12,10 @@ import Logo from '../components/Logo';
 
 type Mode = 'login' | 'register';
 
+const isTouchDevice =
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || (navigator as unknown as { maxTouchPoints?: number }).maxTouchPoints! > 0);
+
 interface AuthProps {
   onLogin: (user: User) => void;
 }
@@ -373,6 +377,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         <form
           onSubmit={handleRegisterSubmit}
           onKeyDown={(e) => {
+            if (isTouchDevice) return;
             if (e.key === 'Enter') {
               const target = e.target as HTMLElement;
               if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
@@ -470,7 +475,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   );
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-start py-4 px-4 sm:py-6 sm:px-6 bg-slate-50 bg-pattern overflow-y-auto">
+    <div className="min-h-screen flex flex-col items-center justify-start py-4 px-4 sm:py-6 sm:px-6 bg-slate-50 bg-pattern">
       <div className="w-full max-w-2xl lg:max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl grid grid-cols-1 lg:grid-cols-5 min-h-0 lg:min-h-[600px] overflow-visible lg:overflow-hidden">
         <div className="hidden lg:block lg:col-span-2">
           <PromoSection />
