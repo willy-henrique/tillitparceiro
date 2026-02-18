@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { SUPPORT_AI_SYSTEM_PROMPT } from '../lib/supportAiPrompt';
 
@@ -70,6 +71,11 @@ function getSimulatedReply(userText: string): string {
 }
 
 const SupportChat: React.FC = () => {
+  const location = useLocation();
+  const hideOnAuth =
+    location.pathname === '/login' || location.pathname === '/registrar' || location.pathname === '/register';
+  if (hideOnAuth) return null;
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
