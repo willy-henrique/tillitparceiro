@@ -370,40 +370,41 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </button>
         </form>
       ) : (
-        <form onSubmit={handleRegisterSubmit} className="space-y-4">
+        <form onSubmit={handleRegisterSubmit} className="space-y-4 flex-1">
           <div className="grid gap-4">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome da Empresa</label>
               <input
                 type="text"
+                autoComplete="organization"
                 value={formData.companyName}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                 placeholder="Nome fantasia ou razão social"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
+                className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome Completo</label>
-              <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+              <input type="text" required autoComplete="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">E-mail Profissional</label>
-              <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+              <input type="email" required autoComplete="email" inputMode="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Telefone/WhatsApp</label>
-                <input type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(00) 00000-0000" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+                <input type="tel" required autoComplete="tel" inputMode="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(00) 00000-0000" className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Senha</label>
-                <input type="password" required value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
+                <input type="password" required autoComplete="new-password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" />
               </div>
             </div>
           </div>
           <label className="flex gap-3 cursor-pointer group bg-slate-50 p-4 rounded-xl">
             <input type="checkbox" required checked={formData.terms} onChange={(e) => setFormData({ ...formData, terms: e.target.checked })} className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" />
-            <span className="text-xs text-slate-500 leading-relaxed">Li e aceito os <a href="#" className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a LGPD.</span>
+            <span className="text-xs text-slate-500 leading-relaxed">Li e aceito os <a href="#termos" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a LGPD.</span>
           </label>
           <p className="text-xs font-bold text-slate-600 bg-amber-50 border border-amber-200 px-4 py-3 rounded-xl">
             Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
@@ -421,12 +422,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-50 bg-pattern">
-      <div className="w-full max-w-2xl lg:max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-5 min-h-[500px] lg:min-h-[600px]">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-start py-4 px-4 sm:py-6 sm:px-6 bg-slate-50 bg-pattern overflow-y-auto">
+      <div className="w-full max-w-2xl lg:max-w-4xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl grid grid-cols-1 lg:grid-cols-5 min-h-0 lg:min-h-[600px] overflow-visible lg:overflow-hidden">
         <div className="hidden lg:block lg:col-span-2">
           <PromoSection />
         </div>
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 overflow-y-auto min-h-0 flex flex-col">
           <div className="lg:hidden py-6 px-4 bg-[#003366]">
             <div className="flex items-center gap-2 text-white">
               <Logo size="sm" variant="light" />

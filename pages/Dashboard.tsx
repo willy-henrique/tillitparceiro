@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LogOut, LayoutDashboard, PlusCircle, Users, 
   TrendingUp, Search, Bell, Filter, ChevronRight, 
-  X, CheckCircle2, AlertCircle, RefreshCw, DollarSign, ArrowLeft, MessageSquare, CreditCard, Copy, Menu
+  X, CheckCircle2, AlertCircle, RefreshCw, DollarSign, ArrowLeft, MessageSquare, CreditCard, Copy, Menu, Wallet, Banknote
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
@@ -83,14 +83,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
     return () => { cancelled = true; };
   }, [user.id]);
 
-  const stats = useMemo(() => ({
-    total: referrals.length,
-    converted: referrals.filter(r => r.status === ReferralStatus.CONVERTIDA || r.status === ReferralStatus.PAGO).length,
-    pending: referrals.filter(r => r.status === ReferralStatus.PENDENTE).length,
-    earnings: referrals
-      .filter(r => r.status === ReferralStatus.CONVERTIDA || r.status === ReferralStatus.PAGO)
-      .reduce((acc, curr) => acc + curr.bonusAmount, 0)
-  }), [referrals]);
+  const stats = useMemo(() => {
+    const aReceber = referrals
+      .filter(r => r.status === ReferralStatus.CONVERTIDA)
+      .reduce((acc, r) => acc + r.bonusAmount, 0);
+    const valorRecebido = referrals
+      .filter(r => r.status === ReferralStatus.PAGO)
+      .reduce((acc, r) => acc + r.bonusAmount, 0);
+    return {
+      total: referrals.length,
+      converted: referrals.filter(r => r.status === ReferralStatus.CONVERTIDA || r.status === ReferralStatus.PAGO).length,
+      pending: referrals.filter(r => r.status === ReferralStatus.PENDENTE).length,
+      earnings: aReceber + valorRecebido,
+      aReceber,
+      valorRecebido,
+    };
+  }, [referrals]);
 
   const currentTier = useMemo(() => {
     const t = BONUS_TIERS.find(tier => stats.converted >= tier.min && stats.converted <= tier.max);
@@ -355,6 +363,32 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
             )}
           </div>
 
+          {/* A receber / Valor recebido — conforme status definido pelo admin */}
+          {(activeTab === 'dashboard' || activeTab === 'indications') && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                <Wallet size={24} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">A receber</p>
+                <p className="text-2xl sm:text-3xl font-black text-[#003366]">R$ {stats.aReceber.toFixed(2)}</p>
+                <p className="text-xs text-slate-500 mt-0.5">Convertidas, aguardando pagamento</p>
+              </div>
+            </div>
+            <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-[#00B050] shrink-0">
+                <Banknote size={24} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Valor recebido</p>
+                <p className="text-2xl sm:text-3xl font-black text-[#003366]">R$ {stats.valorRecebido.toFixed(2)}</p>
+                <p className="text-xs text-slate-500 mt-0.5">Já pago pela administração</p>
+              </div>
+            </div>
+          </div>
+          )}
+
           {/* Gamification Bar - só no dashboard */}
           {(activeTab === 'dashboard' || activeTab === 'indications') && (
           <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden">
@@ -380,7 +414,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                 </div>
               </div>
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center min-w-[200px]">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Ganhos Totais</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total (a receber + recebido)</p>
                 <p className="text-3xl font-black text-[#003366]">R$ {stats.earnings.toFixed(2)}</p>
               </div>
             </div>

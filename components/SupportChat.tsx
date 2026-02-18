@@ -185,12 +185,10 @@ const SupportChat: React.FC = () => {
       )}
 
       {/* Painel: mobile = tela cheia | desktop = card no canto. z-[100] acima da nav do site. */}
-      <div
-        className={`fixed z-[100] flex flex-col bg-white border border-slate-200 transition-all duration-300 ease-out
-          inset-0 max-h-[100dvh] rounded-none
-          sm:inset-auto sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto sm:w-full sm:max-w-[420px] sm:h-[560px] sm:max-h-[85vh] sm:rounded-2xl sm:shadow-2xl
-          ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-[0.98] pointer-events-none'}`}
-      >
+      {isOpen && (
+        <div
+          className="fixed z-[100] flex flex-col bg-white border border-slate-200 transition-all duration-300 ease-out inset-0 max-h-[100dvh] rounded-none sm:inset-auto sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto sm:w-full sm:max-w-[420px] sm:h-[560px] sm:max-h-[85vh] sm:rounded-2xl sm:shadow-2xl"
+        >
         {/* Header com safe-area no topo (notch) para o X sempre visível no mobile */}
         <div
           className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 bg-[#003366] text-white rounded-t-2xl shrink-0 min-h-[56px]"
@@ -292,6 +290,7 @@ const SupportChat: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 };

@@ -200,8 +200,8 @@ const Register: React.FC<RegisterProps> = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-pattern">
-      <div className="max-w-2xl w-full grid md:grid-cols-5 bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative">
+    <div className="min-h-[100dvh] flex flex-col items-center py-4 px-4 bg-slate-50 bg-pattern overflow-y-auto">
+      <div className="max-w-2xl w-full grid md:grid-cols-5 bg-white rounded-2xl sm:rounded-3xl shadow-2xl relative min-h-0 md:overflow-hidden">
         <Link to="/" className="absolute top-4 left-4 z-20 inline-flex items-center gap-2 text-slate-500 hover:text-[#003366] transition-colors text-sm font-medium">
           <ArrowLeft size={18} /> Voltar
         </Link>
@@ -234,7 +234,7 @@ const Register: React.FC<RegisterProps> = () => {
           </div>
         </div>
 
-        <div className="md:col-span-3 p-6 sm:p-10 space-y-6 sm:space-y-8">
+        <div className="md:col-span-3 p-6 sm:p-10 space-y-6 sm:space-y-8 overflow-y-auto min-h-0 flex flex-col">
           <div>
             <h1 className="text-2xl font-bold text-[#003366]">Criar Conta de Parceiro</h1>
             <p className="text-slate-500 text-sm">Preencha os dados abaixo ou use o Google para começar</p>
@@ -261,28 +261,32 @@ const Register: React.FC<RegisterProps> = () => {
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome da Empresa</label>
                 <input 
                   type="text"
+                  autoComplete="organization"
                   value={formData.companyName}
                   onChange={(e) => setFormData({...formData, companyName: e.target.value})}
                   placeholder="Nome fantasia ou razão social"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
+                  className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome Completo</label>
                 <input 
                   type="text" required 
+                  autoComplete="name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
+                  className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">E-mail Profissional</label>
                 <input 
                   type="email" required 
+                  autoComplete="email"
+                  inputMode="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
+                  className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -290,19 +294,22 @@ const Register: React.FC<RegisterProps> = () => {
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Telefone/WhatsApp</label>
                   <input 
                     type="tel" required 
+                    autoComplete="tel"
+                    inputMode="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     placeholder="(00) 00000-0000"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
+                    className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Senha</label>
                   <input 
                     type="password" required 
+                    autoComplete="new-password"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
+                    className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all" 
                   />
                 </div>
               </div>
@@ -317,7 +324,7 @@ const Register: React.FC<RegisterProps> = () => {
                   className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" 
                 />
                 <span className="text-xs text-slate-500 leading-relaxed group-hover:text-slate-700 transition-colors">
-                  Li e aceito os <a href="#" className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a política de tratamento de dados conforme a LGPD.
+                  Li e aceito os <a href="#termos" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a política de tratamento de dados conforme a LGPD.
                 </span>
               </label>
             </div>
