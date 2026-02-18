@@ -4,6 +4,7 @@ import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from './lib/firebase';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import PainelLogin from './pages/PainelLogin';
@@ -82,7 +83,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Auth onLogin={login} />} />
-        <Route path="/registrar" element={<Auth onLogin={login} />} />
+        <Route path="/registrar" element={<Register />} />
         <Route 
           path="/aguardando" 
           element={
