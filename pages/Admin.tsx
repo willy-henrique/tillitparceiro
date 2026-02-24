@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { 
   LogOut, Shield, MessageSquare, CreditCard, 
   Bell, UserCheck, ExternalLink, Calendar, CheckCircle2, 
-  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X, RefreshCw, Menu
+  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X, RefreshCw, Menu, Users
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
 import { getReferrals, updateReferralStatus } from '../lib/referrals';
-import { getPendingPartners, approvePartner, rejectPartner, type PartnerRequest } from '../lib/users';
+import { getPendingPartners, getAllPartners, approvePartner, rejectPartner, type PartnerRequest } from '../lib/users';
 import { getPartnerPix, getPartnersPix, formatPixKeyDisplay, type PartnerPixData } from '../lib/partners';
 import Logo from '../components/Logo';
 
-type Tab = 'approval' | 'leads' | 'payments';
+type Tab = 'approval' | 'leads' | 'payments' | 'partners';
 
 interface AdminProps {
   user: User;
@@ -22,6 +22,9 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   const [tab, setTab] = useState<Tab>('approval');
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [pendingPartners, setPendingPartners] = useState<PartnerRequest[]>([]);
+  const [allPartners, setAllPartners] = useState<PartnerRequest[]>([]);
+  const [partnersLoading, setPartnersLoading] = useState(false);
+  const [partnersError, setPartnersError] = useState<string | null>(null);
   const [partnersPix, setPartnersPix] = useState<Map<string, PartnerPixData>>(new Map());
   const [filter, setFilter] = useState<ReferralStatus | 'ALL'>('ALL');
   const [paymentModal, setPaymentModal] = useState<Referral | null>(null);
@@ -41,6 +44,18 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
         setApprovalError(err?.message ?? 'Erro ao carregar solicitações. Verifique a conexão e as credenciais do Firebase.');
       })
       .finally(() => setApprovalLoading(false));
+  };
+
+  const fetchAllPartners = () => {
+    setPartnersLoading(true);
+    setPartnersError(null);
+    getAllPartners()
+      .then((data) => setAllPartners(data))
+      .catch((err) => {
+        setAllPartners([]);
+        setPartnersError(err?.message ?? 'Erro ao carregar pessoas cadastradas.');
+      })
+      .finally(() => setPartnersLoading(false));
   };
 
   useEffect(() => {
@@ -66,6 +81,24 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
       })
       .finally(() => { if (!cancelled) setApprovalLoading(false); });
     return () => { cancelled = true; };
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab === 'partners') {
+      let cancelled = false;
+      setPartnersLoading(true);
+      setPartnersError(null);
+      getAllPartners()
+        .then((data) => { if (!cancelled) setAllPartners(data); })
+        .catch((err) => {
+          if (!cancelled) {
+            setAllPartners([]);
+            setPartnersError(err?.message ?? 'Erro ao carregar pessoas cadastradas.');
+          }
+        })
+        .finally(() => { if (!cancelled) setPartnersLoading(false); });
+      return () => { cancelled = true; };
+    }
   }, [tab]);
 
   useEffect(() => {
@@ -170,9 +203,10 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
         <ArrowLeft size={18} /> Voltar ao site
       </Link>
       <nav className="flex-1 space-y-2">
-        {(['approval', 'leads', 'payments'] as Tab[]).map((t) => (
+        {(['approval', 'partners', 'leads', 'payments'] as Tab[]).map((t) => (
           <button key={t} onClick={() => { setTab(t); setShowMobileMenu(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all text-left ${tab === t ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
             {t === 'approval' && <><UserPlus size={20} /> Aprovar Utilização</>}
+            {t === 'partners' && <><Users size={20} /> Pessoas cadastradas</>}
             {t === 'leads' && <><Shield size={20} /> Indicações / Leads</>}
             {t === 'payments' && <><CreditCard size={20} /> Pagamentos</>}
           </button>
@@ -215,10 +249,21 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
           </button>
           <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 truncate flex-1">
             {tab === 'approval' && 'Aprovar Utilização do Site'}
+            {tab === 'partners' && 'Pessoas cadastradas'}
             {tab === 'leads' && 'Gestão de Indicações'}
             {tab === 'payments' && 'Pagamento de Bônus'}
           </h2>
           <div className="flex items-center gap-4">
+             {tab === 'partners' && (
+              <button
+                onClick={fetchAllPartners}
+                disabled={partnersLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
+              >
+                <RefreshCw size={16} className={partnersLoading ? 'animate-spin' : ''} />
+                Atualizar
+              </button>
+             )}
              {tab === 'leads' && (
              <div className="flex bg-slate-100 p-1 rounded-lg">
                 <button 
@@ -326,6 +371,112 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
                     {pendingPartners.length === 0 && approvalLoading && (
                       <tr>
                         <td colSpan={5} className="px-8 py-16 text-center text-slate-400">
+                          Carregando...
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {tab === 'partners' && (
+            <div className="space-y-8">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <p className="text-slate-600">Todos os parceiros cadastrados na página (aguardando aprovação, aprovados ou rejeitados).</p>
+                <button
+                  onClick={fetchAllPartners}
+                  disabled={partnersLoading}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
+                >
+                  <RefreshCw size={16} className={partnersLoading ? 'animate-spin' : ''} />
+                  Atualizar
+                </button>
+              </div>
+              {partnersError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                  {partnersError}
+                </div>
+              )}
+              <div className="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
+                <table className="w-full text-left min-w-[700px]">
+                  <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                    <tr>
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">Nome</th>
+                      <th className="px-8 py-4">E-mail</th>
+                      <th className="px-8 py-4">Telefone</th>
+                      <th className="px-8 py-4">Empresa</th>
+                      <th className="px-8 py-4">Status</th>
+                      <th className="px-8 py-4">Data</th>
+                      <th className="px-8 py-4 text-center">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {allPartners.map((p) => (
+                      <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                              {p.name.charAt(0)}
+                            </div>
+                            <p className="text-sm font-bold text-slate-800">{p.name}</p>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-sm text-slate-600">{p.email}</td>
+                        <td className="px-8 py-6 text-sm text-slate-600">{p.phone}</td>
+                        <td className="px-8 py-6 text-sm text-slate-600">{p.companyName || '—'}</td>
+                        <td className="px-8 py-6">
+                          <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold ${
+                            p.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
+                            p.status === 'PENDING_APPROVAL' ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {p.status === 'APPROVED' ? 'Aprovado' : p.status === 'PENDING_APPROVAL' ? 'Pendente' : 'Rejeitado'}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 text-xs text-slate-400">{new Date(p.createdAt).toLocaleDateString('pt-BR')}</td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center justify-center gap-2 flex-wrap">
+                            <button
+                              onClick={() => handleWhatsAppPartner(p)}
+                              title="Contatar no WhatsApp"
+                              className="p-2.5 bg-[#00B050]/10 text-[#00B050] rounded-xl hover:bg-[#00B050] hover:text-white transition-all"
+                            >
+                              <MessageSquare size={18} />
+                            </button>
+                            {p.status === 'PENDING_APPROVAL' && (
+                              <>
+                                <button
+                                  onClick={() => { handleApprove(p.id); setAllPartners((prev) => prev.map((x) => x.id === p.id ? { ...x, status: 'APPROVED' as const } : x)); }}
+                                  title="Aprovar"
+                                  className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"
+                                >
+                                  <CheckCircle2 size={18} />
+                                </button>
+                                <button
+                                  onClick={() => { handleReject(p.id); setAllPartners((prev) => prev.map((x) => x.id === p.id ? { ...x, status: 'REJECTED' as const } : x)); }}
+                                  title="Rejeitar"
+                                  className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                                >
+                                  <XCircle size={18} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {allPartners.length === 0 && !partnersLoading && (
+                      <tr>
+                        <td colSpan={7} className="px-8 py-16 text-center text-slate-400">
+                          Nenhuma pessoa cadastrada.
+                        </td>
+                      </tr>
+                    )}
+                    {allPartners.length === 0 && partnersLoading && (
+                      <tr>
+                        <td colSpan={7} className="px-8 py-16 text-center text-slate-400">
                           Carregando...
                         </td>
                       </tr>

@@ -82,6 +82,35 @@ export async function createPartnerRequest(data: {
   };
 }
 
+/** Lista todos os parceiros cadastrados (qualquer status), ordenados do mais recente. */
+export async function getAllPartners(): Promise<PartnerRequest[]> {
+  const col = collection(db, COLLECTION);
+  const snap = await getDocs(col);
+  return snap.docs
+    .filter((d) => d.data().role === 'PARTNER')
+    .sort((a, b) => {
+      const aTime = a.data().createdAt?.toMillis?.() ?? 0;
+      const bTime = b.data().createdAt?.toMillis?.() ?? 0;
+      return bTime - aTime;
+    })
+    .map((d) => {
+      const data = d.data();
+      const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : '';
+      const updatedAt = data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : '';
+      return {
+        id: d.id,
+        name: String(data.name ?? ''),
+        email: String(data.email ?? ''),
+        phone: String(data.phone ?? ''),
+        companyName: String(data.companyName ?? ''),
+        status: (data.status as PartnerRequest['status']) ?? 'PENDING_APPROVAL',
+        role: 'PARTNER' as const,
+        createdAt,
+        updatedAt,
+      };
+    });
+}
+
 export async function getPendingPartners(): Promise<PartnerRequest[]> {
   const col = collection(db, COLLECTION);
   const q = query(col, where('status', '==', 'PENDING_APPROVAL'));

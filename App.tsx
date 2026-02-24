@@ -40,13 +40,20 @@ const App: React.FC = () => {
           });
         }
       } else {
-        const saved = localStorage.getItem('tillit_user');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed?.role === 'ADMIN') {
-            setAuthState({ user: parsed, isAuthenticated: true });
-          } else {
+        const fromStorage = localStorage.getItem('tillit_user') || sessionStorage.getItem('tillit_user');
+        if (fromStorage) {
+          try {
+            const parsed = JSON.parse(fromStorage) as AuthState['user'];
+            if (parsed?.id && parsed?.email && (parsed.role === 'ADMIN' || parsed.role === 'PARTNER')) {
+              setAuthState({ user: parsed, isAuthenticated: true });
+            } else {
+              localStorage.removeItem('tillit_user');
+              sessionStorage.removeItem('tillit_user');
+              setAuthState({ user: null, isAuthenticated: false });
+            }
+          } catch {
             localStorage.removeItem('tillit_user');
+            sessionStorage.removeItem('tillit_user');
             setAuthState({ user: null, isAuthenticated: false });
           }
         } else {
@@ -58,14 +65,18 @@ const App: React.FC = () => {
     return () => unsub();
   }, []);
 
-  const login = (user: User) => {
-    localStorage.setItem('tillit_user', JSON.stringify(user));
+  const login = (user: User, options?: { rememberMe?: boolean }) => {
+    const storage = options?.rememberMe !== false ? localStorage : sessionStorage;
+    storage.setItem('tillit_user', JSON.stringify(user));
+    if (storage === sessionStorage) localStorage.removeItem('tillit_user');
+    else sessionStorage.removeItem('tillit_user');
     setAuthState({ user, isAuthenticated: true });
   };
 
   const logout = async () => {
     await firebaseSignOut(auth);
     localStorage.removeItem('tillit_user');
+    sessionStorage.removeItem('tillit_user');
     setAuthState({ user: null, isAuthenticated: false });
   };
 

@@ -268,9 +268,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <p className="text-center text-sm text-slate-500">
           Ainda não é parceiro? <Link to="/registrar" className="text-[#00B050] font-bold hover:underline">Cadastre-se grátis</Link>
         </p>
-        <p className="text-center text-xs text-slate-400">
-          <Link to="/painel" className="text-slate-500 hover:text-[#003366]">Acesso administrativo</Link>
-        </p>
       </div>
     </div>
   );

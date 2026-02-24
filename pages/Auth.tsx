@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail, Lock, ChevronRight, Chrome, ArrowLeft, MessageSquare,
-  ShieldCheck, Clock, CheckCircle2, LogIn, UserPlus
+  ShieldCheck, Clock, CheckCircle2, LogIn, UserPlus, KeyRound
 } from 'lucide-react';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { User } from '../types';
 import { createPartnerRequest, createPartnerRequestFromGoogle, getUserByEmail } from '../lib/users';
@@ -17,7 +17,7 @@ const isTouchDevice =
   ('ontouchstart' in window || (navigator as unknown as { maxTouchPoints?: number }).maxTouchPoints! > 0);
 
 interface AuthProps {
-  onLogin: (user: User) => void;
+  onLogin: (user: User, options?: { rememberMe?: boolean }) => void;
 }
 
 const Auth: React.FC<AuthProps> = ({ onLogin }) => {
@@ -43,6 +43,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
+
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  const [forgotError, setForgotError] = useState('');
 
   const [pendingPhone, setPendingPhone] = useState<{
     dbUser: { id: string; name: string; email: string; status: string } | null;
@@ -55,6 +62,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     setLoadingGoogle(true);
     setError('');
     try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const fbUser = result.user;
@@ -70,7 +78,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           role: 'ADMIN',
           status: 'APPROVED',
         };
-        onLogin(appUser);
+        onLogin(appUser, { rememberMe });
         navigate('/painel');
         return;
       }
@@ -107,7 +115,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         email: dbUser.email,
         role: 'PARTNER',
         status,
-      });
+      }, { rememberMe });
       if (status === 'PENDING_APPROVAL') navigate('/aguardando');
       else navigate('/dashboard');
     } catch (err: unknown) {
@@ -139,7 +147,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           email: pendingPhone.dbUser.email,
           role: 'PARTNER',
           status,
-        });
+        }, { rememberMe });
         if (status === 'PENDING_APPROVAL') navigate('/aguardando');
         else navigate('/dashboard');
       } else {
@@ -160,6 +168,32 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailToUse = forgotEmail.trim() || email.trim();
+    if (!emailToUse) {
+      setForgotError('Informe o e-mail da conta.');
+      return;
+    }
+    setForgotLoading(true);
+    setForgotError('');
+    try {
+      await sendPasswordResetEmail(auth, emailToUse);
+      setForgotSuccess(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao enviar e-mail';
+      if (msg.includes('user-not-found')) {
+        setForgotError('Não encontramos uma conta com este e-mail. Verifique ou cadastre-se.');
+      } else if (msg.includes('invalid-email')) {
+        setForgotError('E-mail inválido. Verifique e tente novamente.');
+      } else {
+        setForgotError('Não foi possível enviar o link. Tente novamente em alguns minutos.');
+      }
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email.includes('admin')) {
@@ -169,7 +203,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         email,
         role: 'ADMIN',
         status: 'APPROVED',
-      });
+      }, { rememberMe });
       navigate('/painel');
     } else {
       onLogin({
@@ -178,7 +212,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         email,
         role: 'PARTNER',
         status: 'APPROVED',
-      });
+      }, { rememberMe });
       navigate('/dashboard');
     }
   };
@@ -305,14 +339,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
         <button
           type="button"
-          onClick={() => { setMode('login'); setError(''); }}
+          onClick={() => { setMode('login'); setError(''); setShowForgotPassword(false); setForgotError(''); }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'login' ? 'bg-white text-[#003366] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
         >
           <LogIn size={18} /> Entrar
         </button>
         <button
           type="button"
-          onClick={() => { setMode('register'); setError(''); }}
+          onClick={() => { setMode('register'); setError(''); setShowForgotPassword(false); }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${mode === 'register' ? 'bg-white text-[#003366] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
         >
           <UserPlus size={18} /> Cadastrar
@@ -337,42 +371,135 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       </div>
 
       {mode === 'login' ? (
-        <form onSubmit={handleLoginSubmit} className="space-y-4">
-          <div className="space-y-4">
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Seu e-mail"
-                className="w-full pl-12 pr-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all"
-              />
+        showForgotPassword ? (
+          <div className="space-y-5">
+            <div className="flex items-center gap-3 pb-2">
+              <div className="w-10 h-10 rounded-full bg-[#003366]/10 flex items-center justify-center">
+                <KeyRound className="text-[#003366]" size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-[#003366]">Recuperar senha</h2>
+                <p className="text-sm text-slate-500">Enviaremos um link para redefinir sua senha.</p>
+              </div>
             </div>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Sua senha"
-                className="w-full pl-12 pr-4 py-3 sm:py-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/10 focus:border-[#003366] transition-all"
-              />
+            {forgotSuccess ? (
+              <div className="space-y-4">
+                <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-4 rounded-xl">
+                  <p className="font-medium">E-mail enviado.</p>
+                  <p className="mt-1 text-green-700">Se existir uma conta com esse e-mail, você receberá um link para redefinir a senha. Verifique a caixa de entrada e o spam.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setShowForgotPassword(false); setForgotSuccess(false); setForgotEmail(''); setForgotError(''); }}
+                  className="w-full text-[#003366] font-bold py-3 rounded-xl border-2 border-[#003366] hover:bg-[#003366]/5 transition-all"
+                >
+                  Voltar ao login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4" autoComplete="off">
+                <div className="space-y-1.5">
+                  <label htmlFor="forgot-email" className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <Mail size={14} className="text-slate-400" />
+                    E-mail da conta
+                  </label>
+                  <input
+                    id="forgot-email"
+                    name="forgot-email"
+                    type="email"
+                    required
+                    autoComplete="off"
+                    value={forgotEmail || email}
+                    onChange={(e) => { setForgotEmail(e.target.value); setForgotError(''); }}
+                    placeholder="digite o e-mail cadastrado"
+                    className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
+                  />
+                </div>
+                {forgotError && <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{forgotError}</p>}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="flex-1 bg-[#003366] text-white py-3.5 rounded-xl font-bold hover:bg-[#002244] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {forgotLoading ? 'Enviando...' : 'Enviar link de recuperação'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowForgotPassword(false); setForgotError(''); setForgotEmail(''); }}
+                    className="py-3.5 px-4 rounded-xl font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all"
+                  >
+                    Voltar
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        ) : (
+          <form
+            onSubmit={handleLoginSubmit}
+            autoComplete="off"
+            className="space-y-5"
+          >
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="login-email" className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Mail size={14} className="text-slate-400" />
+                  E-mail
+                </label>
+                <input
+                  id="login-email"
+                  name="login-email"
+                  type="email"
+                  required
+                  autoComplete="off"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="digite seu e-mail"
+                  className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="login-password" className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Lock size={14} className="text-slate-400" />
+                  Senha
+                </label>
+                <input
+                  id="login-password"
+                  name="login-password"
+                  type="password"
+                  required
+                  autoComplete="off"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="digite sua senha"
+                  className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
+                />
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" />
-              <span className="text-slate-500">Lembrar de mim</span>
-            </label>
-            <a href="#" className="text-[#003366] font-bold hover:underline">Esqueceu a senha?</a>
-          </div>
-          <button type="submit" className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#002244] transition-all shadow-xl shadow-blue-900/20">
-            Entrar no Portal <ChevronRight size={18} />
-          </button>
-        </form>
+            <div className="flex items-center justify-between text-xs">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]"
+                />
+                <span className="text-slate-500">Lembrar de mim</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => { setShowForgotPassword(true); setForgotError(''); setForgotSuccess(false); setForgotEmail(email); }}
+                className="text-[#003366] font-bold hover:underline"
+              >
+                Esqueceu a senha?
+              </button>
+            </div>
+            <button type="submit" className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#002244] transition-all shadow-xl shadow-blue-900/20">
+              Entrar no Portal <ChevronRight size={18} />
+            </button>
+          </form>
+        )
       ) : (
         <form
           onSubmit={handleRegisterSubmit}
@@ -468,9 +595,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         </form>
       )}
 
-      <p className="text-center text-xs text-slate-400 mt-6">
-        <Link to="/painel" className="text-slate-500 hover:text-[#003366]">Acesso administrativo</Link>
-      </p>
     </div>
   );
 
