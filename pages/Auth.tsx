@@ -46,6 +46,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const loginEmailRef = useRef<HTMLInputElement>(null);
   const loginPasswordRef = useRef<HTMLInputElement>(null);
   const forgotEmailRef = useRef<HTMLInputElement>(null);
+  const registerCompanyRef = useRef<HTMLInputElement>(null);
+  const registerNameRef = useRef<HTMLInputElement>(null);
+  const registerEmailRef = useRef<HTMLInputElement>(null);
+  const registerPhoneRef = useRef<HTMLInputElement>(null);
+  const registerPasswordRef = useRef<HTMLInputElement>(null);
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
@@ -233,15 +238,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const companyName = registerCompanyRef.current?.value?.trim() ?? '';
+    const name = registerNameRef.current?.value?.trim() ?? '';
+    const email = registerEmailRef.current?.value?.trim() ?? '';
+    const phone = registerPhoneRef.current?.value?.trim() ?? '';
+    if (!name || !email || !phone) return;
     setLoading(true);
     setError('');
     try {
-      await createPartnerRequest({
-        companyName: formData.companyName,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-      });
+      await createPartnerRequest({ companyName, name, email, phone });
+      setFormData((prev) => ({ ...prev, companyName, name, email, phone }));
       setStep(2);
     } catch {
       setError('Erro ao enviar cadastro. Tente novamente.');
@@ -532,10 +538,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome da Empresa</label>
               <input
+                ref={registerCompanyRef}
                 type="text"
-                autoComplete="organization"
-                value={formData.companyName}
-                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                autoComplete="off"
                 placeholder="Nome fantasia ou razão social"
                 className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
               />
@@ -543,23 +548,23 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nome Completo</label>
               <input
+                ref={registerNameRef}
                 type="text"
                 required
-                autoComplete="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                autoComplete="off"
+                placeholder="Seu nome completo"
                 className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">E-mail Profissional</label>
               <input
+                ref={registerEmailRef}
                 type="email"
                 required
-                autoComplete="email"
+                autoComplete="off"
                 inputMode="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="seu@email.com"
                 className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
               />
             </div>
@@ -567,12 +572,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Telefone/WhatsApp</label>
                 <input
+                  ref={registerPhoneRef}
                   type="tel"
                   required
-                  autoComplete="tel"
+                  autoComplete="off"
                   inputMode="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="(00) 00000-0000"
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
                 />
@@ -580,11 +584,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Senha</label>
                 <input
+                  ref={registerPasswordRef}
                   type="password"
                   required
                   autoComplete="new-password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Sua senha"
                   className="w-full px-4 py-3 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#003366] transition-all"
                 />
               </div>
