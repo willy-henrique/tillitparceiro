@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail, Lock, ChevronRight, Chrome, ArrowLeft, MessageSquare,
-  ShieldCheck, Clock, CheckCircle2, LogIn, UserPlus, KeyRound
+  ShieldCheck, Clock, CheckCircle2, LogIn, UserPlus
 } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import { auth } from '../lib/firebase';
@@ -376,15 +376,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       {mode === 'login' ? (
         showForgotPassword ? (
           <div className="space-y-5">
-            <div className="flex items-center gap-3 pb-2">
-              <div className="w-10 h-10 rounded-full bg-[#003366]/10 flex items-center justify-center">
-                <KeyRound className="text-[#003366]" size={20} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-[#003366]">Recuperar senha</h2>
-                <p className="text-sm text-slate-500">Enviaremos um link para redefinir sua senha.</p>
-              </div>
-            </div>
             {forgotSuccess ? (
               <div className="space-y-4">
                 <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-4 rounded-xl">
@@ -394,47 +385,50 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 <button
                   type="button"
                   onClick={() => { setShowForgotPassword(false); setForgotSuccess(false); setForgotEmail(''); setForgotError(''); }}
-                  className="w-full text-[#003366] font-bold py-3 rounded-xl border-2 border-[#003366] hover:bg-[#003366]/5 transition-all"
+                  className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold hover:bg-[#002244] transition-all shadow-xl shadow-blue-900/20"
                 >
                   Voltar ao login
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4" autoComplete="off">
-                <div className="space-y-1.5">
-                  <label htmlFor="forgot-email" className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <Mail size={14} className="text-slate-400" />
-                    E-mail da conta
-                  </label>
-                  <input
-                    id="forgot-email"
-                    name="forgot-email"
-                    type="email"
-                    required
-                    autoComplete="off"
-                    value={forgotEmail}
-                    onChange={(e) => { setForgotEmail(e.target.value); setForgotError(''); }}
-                    placeholder="digite o e-mail cadastrado"
-                    className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
-                  />
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-5" autoComplete="off">
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label htmlFor="forgot-email" className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                      <Mail size={14} className="text-slate-400" />
+                      E-mail
+                    </label>
+                    <input
+                      id="forgot-email"
+                      name="forgot-email"
+                      type="email"
+                      required
+                      autoComplete="off"
+                      value={forgotEmail}
+                      onChange={(e) => { setForgotEmail(e.target.value); setForgotError(''); }}
+                      placeholder="digite seu e-mail"
+                      className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
+                      aria-label="E-mail"
+                    />
+                  </div>
                 </div>
                 {forgotError && <p className="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-xl">{forgotError}</p>}
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    type="submit"
-                    disabled={forgotLoading}
-                    className="flex-1 bg-[#003366] text-white py-3.5 rounded-xl font-bold hover:bg-[#002244] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {forgotLoading ? 'Enviando...' : 'Enviar link de recuperação'}
-                  </button>
+                <div className="flex items-center justify-end text-xs">
                   <button
                     type="button"
                     onClick={() => { setShowForgotPassword(false); setForgotError(''); setForgotEmail(''); }}
-                    className="py-3.5 px-4 rounded-xl font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all"
+                    className="text-[#003366] font-bold hover:underline"
                   >
-                    Voltar
+                    Voltar ao login
                   </button>
                 </div>
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#002244] transition-all shadow-xl shadow-blue-900/20 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {forgotLoading ? 'Enviando...' : 'Enviar link de recuperação'} <ChevronRight size={18} />
+                </button>
               </form>
             )}
           </div>
