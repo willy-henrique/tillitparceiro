@@ -30,15 +30,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     setMode(location.pathname === '/registrar' ? 'register' : 'login');
   }, [location.pathname]);
 
-  useEffect(() => {
-    if (!showForgotPassword) return;
-    const timer = setTimeout(() => {
-      if (forgotEmailRef.current && loginEmailRef.current) {
-        forgotEmailRef.current.value = loginEmailRef.current.value?.trim() ?? '';
-      }
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [showForgotPassword]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
@@ -60,6 +51,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotError, setForgotError] = useState('');
+
+  useEffect(() => {
+    if (!showForgotPassword) return;
+    const timer = setTimeout(() => {
+      if (forgotEmailRef.current && loginEmailRef.current) {
+        forgotEmailRef.current.value = loginEmailRef.current.value?.trim() ?? '';
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [showForgotPassword]);
 
   const [pendingPhone, setPendingPhone] = useState<{
     dbUser: { id: string; name: string; email: string; status: string } | null;
