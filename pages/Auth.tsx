@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail, Lock, ChevronRight, Chrome, ArrowLeft, MessageSquare,
@@ -41,9 +41,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     password: '',
     terms: false,
   });
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const loginEmailRef = useRef<HTMLInputElement>(null);
+  const loginPasswordRef = useRef<HTMLInputElement>(null);
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
@@ -170,7 +170,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailToUse = forgotEmail.trim() || email.trim();
+    const emailToUse = forgotEmail.trim();
     if (!emailToUse) {
       setForgotError('Informe o e-mail da conta.');
       return;
@@ -196,11 +196,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.includes('admin')) {
+    const emailVal = loginEmailRef.current?.value?.trim() ?? '';
+    const passwordVal = loginPasswordRef.current?.value ?? '';
+    if (!emailVal) return;
+    if (emailVal.includes('admin')) {
       onLogin({
         id: 'adm_1',
         name: 'Carlos Admin',
-        email,
+        email: emailVal,
         role: 'ADMIN',
         status: 'APPROVED',
       }, { rememberMe });
@@ -209,7 +212,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       onLogin({
         id: 'usr_1',
         name: 'João Parceiro',
-        email,
+        email: emailVal,
         role: 'PARTNER',
         status: 'APPROVED',
       }, { rememberMe });
@@ -409,7 +412,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     type="email"
                     required
                     autoComplete="off"
-                    value={forgotEmail || email}
+                    value={forgotEmail}
                     onChange={(e) => { setForgotEmail(e.target.value); setForgotError(''); }}
                     placeholder="digite o e-mail cadastrado"
                     className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
@@ -448,15 +451,15 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   E-mail
                 </label>
                 <input
+                  ref={loginEmailRef}
                   id="login-email"
                   name="login-email"
                   type="email"
                   required
                   autoComplete="off"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="digite seu e-mail"
                   className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
+                  aria-label="E-mail"
                 />
               </div>
               <div className="space-y-1.5">
@@ -465,15 +468,15 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   Senha
                 </label>
                 <input
+                  ref={loginPasswordRef}
                   id="login-password"
                   name="login-password"
                   type="password"
                   required
                   autoComplete="off"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="digite sua senha"
                   className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
+                  aria-label="Senha"
                 />
               </div>
             </div>
@@ -489,7 +492,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </label>
               <button
                 type="button"
-                onClick={() => { setShowForgotPassword(true); setForgotError(''); setForgotSuccess(false); setForgotEmail(email); }}
+                onClick={() => { setShowForgotPassword(true); setForgotError(''); setForgotSuccess(false); setForgotEmail(loginEmailRef.current?.value?.trim() ?? ''); }}
                 className="text-[#003366] font-bold hover:underline"
               >
                 Esqueceu a senha?
