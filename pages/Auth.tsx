@@ -40,7 +40,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     email: '',
     phone: '',
     password: '',
-    terms: false,
   });
   const [rememberMe, setRememberMe] = useState(true);
   const loginEmailRef = useRef<HTMLInputElement>(null);
@@ -595,8 +594,23 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             </div>
           </div>
           <label className="flex gap-3 cursor-pointer group bg-slate-50 p-4 rounded-xl">
-            <input type="checkbox" required checked={formData.terms} onChange={(e) => setFormData({ ...formData, terms: e.target.checked })} className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]" />
-            <span className="text-xs text-slate-500 leading-relaxed">Li e aceito os <a href="javascript:void(0)" role="button" onClick={(e) => e.preventDefault()} className="text-[#003366] font-bold hover:underline">Termos do Programa Parceiro+</a> e concordo com a LGPD.</span>
+            <input
+              type="checkbox"
+              required
+              className="mt-1 w-5 h-5 rounded border-slate-300 text-[#00B050] focus:ring-[#00B050]"
+            />
+            <span className="text-xs text-slate-500 leading-relaxed">
+              Li e aceito os{' '}
+              <a
+                href="javascript:void(0)"
+                role="button"
+                onClick={(e) => e.preventDefault()}
+                className="text-[#003366] font-bold hover:underline"
+              >
+                Termos do Programa Parceiro+
+              </a>
+              .
+            </span>
           </label>
           <p className="text-xs font-bold text-slate-600 bg-amber-50 border border-amber-200 px-4 py-3 rounded-xl">
             Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
