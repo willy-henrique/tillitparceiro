@@ -29,6 +29,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   useEffect(() => {
     setMode(location.pathname === '/registrar' ? 'register' : 'login');
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!showForgotPassword) return;
+    const timer = setTimeout(() => {
+      if (forgotEmailRef.current && loginEmailRef.current) {
+        forgotEmailRef.current.value = loginEmailRef.current.value?.trim() ?? '';
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [showForgotPassword]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
@@ -44,9 +54,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [rememberMe, setRememberMe] = useState(true);
   const loginEmailRef = useRef<HTMLInputElement>(null);
   const loginPasswordRef = useRef<HTMLInputElement>(null);
+  const forgotEmailRef = useRef<HTMLInputElement>(null);
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotError, setForgotError] = useState('');
@@ -170,7 +180,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailToUse = forgotEmail.trim();
+    const emailToUse = forgotEmailRef.current?.value?.trim() ?? '';
     if (!emailToUse) {
       setForgotError('Informe o e-mail da conta.');
       return;
@@ -384,7 +394,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setShowForgotPassword(false); setForgotSuccess(false); setForgotEmail(''); setForgotError(''); }}
+                  onClick={() => { setShowForgotPassword(false); setForgotSuccess(false); setForgotError(''); if (forgotEmailRef.current) forgotEmailRef.current.value = ''; }}
                   className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold hover:bg-[#002244] transition-all shadow-xl shadow-blue-900/20"
                 >
                   Voltar ao login
@@ -399,16 +409,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                       E-mail
                     </label>
                     <input
+                      ref={forgotEmailRef}
                       id="forgot-email"
                       name="forgot-email"
                       type="email"
                       required
                       autoComplete="off"
-                      value={forgotEmail}
-                      onChange={(e) => { setForgotEmail(e.target.value); setForgotError(''); }}
                       placeholder="digite seu e-mail"
                       className="w-full px-4 py-3.5 text-base bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] transition-all placeholder:text-slate-400"
                       aria-label="E-mail"
+                      onChange={() => setForgotError('')}
                     />
                   </div>
                 </div>
@@ -416,7 +426,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 <div className="flex items-center justify-end text-xs">
                   <button
                     type="button"
-                    onClick={() => { setShowForgotPassword(false); setForgotError(''); setForgotEmail(''); }}
+                    onClick={() => { setShowForgotPassword(false); setForgotError(''); }}
                     className="text-[#003366] font-bold hover:underline"
                   >
                     Voltar ao login
@@ -486,7 +496,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </label>
               <button
                 type="button"
-                onClick={() => { setShowForgotPassword(true); setForgotError(''); setForgotSuccess(false); setForgotEmail(loginEmailRef.current?.value?.trim() ?? ''); }}
+                onClick={() => { setShowForgotPassword(true); setForgotError(''); setForgotSuccess(false); }}
                 className="text-[#003366] font-bold hover:underline"
               >
                 Esqueceu a senha?
