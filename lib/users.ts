@@ -16,7 +16,7 @@ export interface PartnerRequest {
   email: string;
   phone: string;
   companyName?: string;
-  status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
+  status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'BLOCKED';
   role: 'PARTNER';
   createdAt: string;
   updatedAt: string;
@@ -153,6 +153,14 @@ export async function rejectPartner(id: string): Promise<void> {
   const ref = doc(db, COLLECTION, id);
   await updateDoc(ref, {
     status: 'REJECTED',
+    updatedAt: Timestamp.now(),
+  });
+}
+
+export async function blockPartner(id: string): Promise<void> {
+  const ref = doc(db, COLLECTION, id);
+  await updateDoc(ref, {
+    status: 'BLOCKED',
     updatedAt: Timestamp.now(),
   });
 }

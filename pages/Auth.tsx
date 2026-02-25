@@ -103,6 +103,10 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         setError('Seu cadastro foi rejeitado. Entre em contato com o suporte.');
         return;
       }
+      if (dbUser?.status === 'BLOCKED') {
+        setError('Sua conta está bloqueada. Entre em contato com o suporte.');
+        return;
+      }
 
       if (dbUser && !dbUser.phone?.trim()) {
         setPendingPhone({

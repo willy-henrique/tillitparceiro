@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { 
   LogOut, Shield, MessageSquare, CreditCard, 
-  Bell, UserCheck, ExternalLink, Calendar, CheckCircle2, 
-  ArrowLeft, UserPlus, XCircle, Copy, Banknote, X, RefreshCw, Menu, Users
+  Bell, ExternalLink, Calendar, CheckCircle2, 
+  ArrowLeft, XCircle, Copy, Banknote, X, RefreshCw, Menu, Users, Search, UserX
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { User, Referral, ReferralStatus } from '../types';
 import { getReferrals, updateReferralStatus } from '../lib/referrals';
-import { getPendingPartners, getAllPartners, approvePartner, rejectPartner, type PartnerRequest } from '../lib/users';
+import { getAllPartners, approvePartner, rejectPartner, blockPartner, type PartnerRequest } from '../lib/users';
 import { getPartnerPix, getPartnersPix, formatPixKeyDisplay, type PartnerPixData } from '../lib/partners';
 import Logo from '../components/Logo';
 
-type Tab = 'approval' | 'leads' | 'payments' | 'partners';
+type Tab = 'leads' | 'payments' | 'partners';
 
 interface AdminProps {
   user: User;
@@ -19,9 +19,8 @@ interface AdminProps {
 }
 
 const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
-  const [tab, setTab] = useState<Tab>('approval');
+  const [tab, setTab] = useState<Tab>('partners');
   const [referrals, setReferrals] = useState<Referral[]>([]);
-  const [pendingPartners, setPendingPartners] = useState<PartnerRequest[]>([]);
   const [allPartners, setAllPartners] = useState<PartnerRequest[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(false);
   const [partnersError, setPartnersError] = useState<string | null>(null);
@@ -30,21 +29,8 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   const [paymentModal, setPaymentModal] = useState<Referral | null>(null);
   const [paymentPix, setPaymentPix] = useState<PartnerPixData | null>(null);
   const [confirmingPayment, setConfirmingPayment] = useState(false);
-  const [approvalLoading, setApprovalLoading] = useState(false);
-  const [approvalError, setApprovalError] = useState<string | null>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-
-  const fetchPendingPartners = () => {
-    setApprovalLoading(true);
-    setApprovalError(null);
-    getPendingPartners()
-      .then((data) => setPendingPartners(data))
-      .catch((err) => {
-        setPendingPartners([]);
-        setApprovalError(err?.message ?? 'Erro ao carregar solicitações. Verifique a conexão e as credenciais do Firebase.');
-      })
-      .finally(() => setApprovalLoading(false));
-  };
+  const [partnersSearch, setPartnersSearch] = useState('');
 
   const fetchAllPartners = () => {
     setPartnersLoading(true);
@@ -65,23 +51,6 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
       .catch(() => { if (!cancelled) setReferrals([]); });
     return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    if (tab !== 'approval') return;
-    let cancelled = false;
-    setApprovalLoading(true);
-    setApprovalError(null);
-    getPendingPartners()
-      .then((data) => { if (!cancelled) setPendingPartners(data); })
-      .catch((err) => {
-        if (!cancelled) {
-          setPendingPartners([]);
-          setApprovalError(err?.message ?? 'Erro ao carregar solicitações.');
-        }
-      })
-      .finally(() => { if (!cancelled) setApprovalLoading(false); });
-    return () => { cancelled = true; };
-  }, [tab]);
 
   useEffect(() => {
     if (tab === 'partners') {
@@ -153,7 +122,16 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   const handleReject = async (id: string) => {
     try {
       await rejectPartner(id);
-      setPendingPartners((prev) => prev.filter((p) => p.id !== id));
+      setAllPartners((prev) => prev.map((p) => p.id === id ? { ...p, status: 'REJECTED' as const } : p));
+    } catch {
+      // error
+    }
+  };
+
+  const handleBlock = async (id: string) => {
+    try {
+      await blockPartner(id);
+      setAllPartners((prev) => prev.map((p) => p.id === id ? { ...p, status: 'BLOCKED' as const } : p));
     } catch {
       // error
     }
@@ -162,6 +140,17 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
   const filteredReferrals = filter === 'ALL' 
     ? referrals 
     : referrals.filter(r => r.status === filter);
+
+  const q = partnersSearch.trim().toLowerCase();
+  const filteredPartners = q
+    ? allPartners.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.email && p.email.toLowerCase().includes(q)) ||
+          (p.phone && p.phone.replace(/\D/g, '').includes(q.replace(/\D/g, ''))) ||
+          (p.companyName && p.companyName.toLowerCase().includes(q))
+      )
+    : allPartners;
 
   const toPayReferrals = referrals.filter(r => r.status === ReferralStatus.CONVERTIDA);
   const toPayTotal = toPayReferrals.reduce((acc, r) => acc + r.bonusAmount, 0);
@@ -203,9 +192,8 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
         <ArrowLeft size={18} /> Voltar ao site
       </Link>
       <nav className="flex-1 space-y-2">
-        {(['approval', 'partners', 'leads', 'payments'] as Tab[]).map((t) => (
+        {(['partners', 'leads', 'payments'] as Tab[]).map((t) => (
           <button key={t} onClick={() => { setTab(t); setShowMobileMenu(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all text-left ${tab === t ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
-            {t === 'approval' && <><UserPlus size={20} /> Aprovar Utilização</>}
             {t === 'partners' && <><Users size={20} /> Pessoas cadastradas</>}
             {t === 'leads' && <><Shield size={20} /> Indicações / Leads</>}
             {t === 'payments' && <><CreditCard size={20} /> Pagamentos</>}
@@ -248,7 +236,6 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
             <Menu size={24} />
           </button>
           <h2 className="text-base sm:text-lg lg:text-xl font-bold text-slate-800 truncate flex-1">
-            {tab === 'approval' && 'Aprovar Utilização do Site'}
             {tab === 'partners' && 'Pessoas cadastradas'}
             {tab === 'leads' && 'Gestão de Indicações'}
             {tab === 'payments' && 'Pagamento de Bônus'}
@@ -291,108 +278,30 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 overflow-x-auto">
-          {tab === 'approval' && (
-            <div className="space-y-8">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <p className="text-slate-600">Solicitações de parceiros aguardando liberação para utilizar o site completo.</p>
-                <button
-                  onClick={fetchPendingPartners}
-                  disabled={approvalLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
-                >
-                  <RefreshCw size={16} className={approvalLoading ? 'animate-spin' : ''} />
-                  Atualizar
-                </button>
-              </div>
-              {approvalError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                  {approvalError}
-                </div>
-              )}
-              <div className="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
-                <table className="w-full text-left min-w-[600px]">
-                  <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                    <tr>
-                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">Nome</th>
-                      <th className="px-8 py-4">E-mail</th>
-                      <th className="px-8 py-4">Telefone</th>
-                      <th className="px-8 py-4">Data</th>
-                      <th className="px-8 py-4 text-center">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {pendingPartners.map((p) => (
-                      <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-8 py-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
-                              {p.name.charAt(0)}
-                            </div>
-                            <p className="text-sm font-bold text-slate-800">{p.name}</p>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6 text-sm text-slate-600">{p.email}</td>
-                        <td className="px-8 py-6 text-sm text-slate-600">{p.phone}</td>
-                        <td className="px-8 py-6 text-xs text-slate-400">{new Date(p.createdAt).toLocaleDateString('pt-BR')}</td>
-                        <td className="px-8 py-6">
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => handleWhatsAppPartner(p)}
-                              title="Contatar no WhatsApp"
-                              className="p-2.5 bg-[#00B050]/10 text-[#00B050] rounded-xl hover:bg-[#00B050] hover:text-white transition-all"
-                            >
-                              <MessageSquare size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleApprove(p.id)}
-                              title="Aprovar"
-                              className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-500 hover:text-white transition-all"
-                            >
-                              <CheckCircle2 size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleReject(p.id)}
-                              title="Rejeitar"
-                              className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-500 hover:text-white transition-all"
-                            >
-                              <XCircle size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {pendingPartners.length === 0 && !approvalLoading && (
-                      <tr>
-                        <td colSpan={5} className="px-8 py-16 text-center text-slate-400">
-                          Nenhuma solicitação pendente.
-                        </td>
-                      </tr>
-                    )}
-                    {pendingPartners.length === 0 && approvalLoading && (
-                      <tr>
-                        <td colSpan={5} className="px-8 py-16 text-center text-slate-400">
-                          Carregando...
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
           {tab === 'partners' && (
             <div className="space-y-8">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <p className="text-slate-600">Todos os parceiros cadastrados na página (aguardando aprovação, aprovados ou rejeitados).</p>
-                <button
-                  onClick={fetchAllPartners}
-                  disabled={partnersLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
-                >
-                  <RefreshCw size={16} className={partnersLoading ? 'animate-spin' : ''} />
-                  Atualizar
-                </button>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-wrap">
+                <p className="text-slate-600">Todos os parceiros cadastrados na página (aguardando aprovação, aprovados, rejeitados ou bloqueados).</p>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <div className="relative flex-1 min-w-[200px] max-w-sm">
+                    <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="search"
+                      placeholder="Buscar por nome, e-mail, telefone ou empresa..."
+                      value={partnersSearch}
+                      onChange={(e) => setPartnersSearch(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00B050]/30 focus:border-[#00B050]"
+                    />
+                  </div>
+                  <button
+                    onClick={fetchAllPartners}
+                    disabled={partnersLoading}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium disabled:opacity-50 transition-colors"
+                  >
+                    <RefreshCw size={16} className={partnersLoading ? 'animate-spin' : ''} />
+                    Atualizar
+                  </button>
+                </div>
               </div>
               {partnersError && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
@@ -413,7 +322,7 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {allPartners.map((p) => (
+                    {filteredPartners.map((p) => (
                       <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-8 py-6">
                           <div className="flex items-center gap-3">
@@ -430,9 +339,10 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
                           <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold ${
                             p.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
                             p.status === 'PENDING_APPROVAL' ? 'bg-amber-100 text-amber-700' :
+                            p.status === 'BLOCKED' ? 'bg-slate-200 text-slate-700' :
                             'bg-red-100 text-red-700'
                           }`}>
-                            {p.status === 'APPROVED' ? 'Aprovado' : p.status === 'PENDING_APPROVAL' ? 'Pendente' : 'Rejeitado'}
+                            {p.status === 'APPROVED' ? 'Aprovado' : p.status === 'PENDING_APPROVAL' ? 'Pendente' : p.status === 'BLOCKED' ? 'Bloqueado' : 'Rejeitado'}
                           </span>
                         </td>
                         <td className="px-8 py-6 text-xs text-slate-400">{new Date(p.createdAt).toLocaleDateString('pt-BR')}</td>
@@ -463,18 +373,27 @@ const Admin: React.FC<AdminProps> = ({ user, onLogout }) => {
                                 </button>
                               </>
                             )}
+                            {(p.status === 'APPROVED' || p.status === 'PENDING_APPROVAL') && (
+                              <button
+                                onClick={() => handleBlock(p.id)}
+                                title="Bloquear cliente"
+                                className="p-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-700 hover:text-white transition-all"
+                              >
+                                <UserX size={18} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
                     ))}
-                    {allPartners.length === 0 && !partnersLoading && (
+                    {filteredPartners.length === 0 && !partnersLoading && (
                       <tr>
                         <td colSpan={7} className="px-8 py-16 text-center text-slate-400">
-                          Nenhuma pessoa cadastrada.
+                          {q ? 'Nenhum resultado para a busca.' : 'Nenhuma pessoa cadastrada.'}
                         </td>
                       </tr>
                     )}
-                    {allPartners.length === 0 && partnersLoading && (
+                    {filteredPartners.length === 0 && partnersLoading && (
                       <tr>
                         <td colSpan={7} className="px-8 py-16 text-center text-slate-400">
                           Carregando...

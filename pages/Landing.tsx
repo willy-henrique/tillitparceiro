@@ -263,7 +263,21 @@ const Landing: React.FC = () => {
             <Logo size="sm" variant="light" />
             <span className="font-tillit text-[#00B050] font-bold text-lg">Parceiro+</span>
           </div>
-          <p className="text-slate-400 text-xs">© 2026 TILLIT Tecnologia. Todos os direitos reservados. LGPD Compliance.</p>
+          <div className="flex flex-col items-center gap-1 text-center">
+            <p className="text-slate-400 text-xs">© 2026 TILLIT Tecnologia. Todos os direitos reservados. LGPD Compliance.</p>
+            <p className="text-slate-500 text-xs">
+              Site desenvolvido por{' '}
+              <a
+                href="https://engenheirowilly-opal.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#003366] font-semibold hover:text-[#00B050] hover:underline transition-colors"
+              >
+                Willy Henrique
+              </a>
+              {' '}— Engenheiro de Software
+            </p>
+          </div>
           <div className="flex gap-6 text-slate-400 text-sm">
             <button type="button" onClick={() => setModal('privacidade')} className="hover:text-[#003366] transition-colors">Privacidade</button>
             <button type="button" onClick={() => setModal('termos')} className="hover:text-[#003366] transition-colors">Termos de Uso</button>
