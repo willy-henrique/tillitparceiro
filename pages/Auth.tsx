@@ -321,13 +321,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       await createUserWithEmailAndPassword(auth, email, password);
       await createPartnerRequest({ companyName, name, email, phone });
       setFormData((prev) => ({ ...prev, companyName, name, email, phone }));
-      // Volta para a aba de login após cadastro
+      // fluxo: cadastrar -> voltar para login com e-mail preenchido
       if (loginEmailRef.current) {
         loginEmailRef.current.value = email;
       }
       setMode('login');
       setStep(1);
-      setError('Cadastro criado com sucesso! Agora você já pode entrar com seu e-mail e senha.');
+      setError('Cadastro criado com sucesso! Agora entre com seu e-mail e senha.');
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
       const code = error.code ?? '';
