@@ -24,10 +24,10 @@ const App: React.FC = () => {
       if (fbUser) {
         const { getUserByEmail } = await import('./lib/users');
         const dbUser = await getUserByEmail(fbUser.email ?? '');
-        if (!dbUser || dbUser.status === 'REJECTED') {
+        if (!dbUser || dbUser.status === 'REJECTED' || dbUser.status === 'BLOCKED') {
           setAuthState({ user: null, isAuthenticated: false });
         } else {
-          const status = dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+          const status: User['status'] = 'APPROVED';
           setAuthState({
             user: {
               id: fbUser.uid,
@@ -97,20 +97,14 @@ const App: React.FC = () => {
         <Route path="/registrar" element={<Register />} />
         <Route 
           path="/aguardando" 
-          element={
-            authState.isAuthenticated && authState.user?.status === 'PENDING_APPROVAL'
-              ? <AguardandoAprovacao />
-              : authState.isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
-          } 
+          element={<Navigate to={authState.isAuthenticated ? "/dashboard" : "/login"} />} 
         />
         
         <Route 
           path="/dashboard/*" 
           element={
             authState.isAuthenticated && authState.user?.role === 'PARTNER' 
-              ? authState.user?.status === 'PENDING_APPROVAL'
-                ? <Navigate to="/aguardando" />
-                : <Dashboard user={authState.user} onLogout={logout} />
+              ? <Dashboard user={authState.user} onLogout={logout} />
               : <Navigate to="/login" />
           } 
         />

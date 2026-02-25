@@ -136,7 +136,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         return;
       }
 
-      const status = dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+      const status: User['status'] = 'APPROVED';
       onLogin({
         id: fbUser.uid,
         name: dbUser.name,
@@ -144,8 +144,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         role: 'PARTNER',
         status,
       }, { rememberMe });
-      if (status === 'PENDING_APPROVAL') navigate('/aguardando');
-      else navigate('/dashboard');
+      navigate('/dashboard');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao autenticar';
       setError(msg.includes('popup-closed') ? '' : msg);
@@ -168,7 +167,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       const { updateUserPhone, createPartnerRequestFromGoogle } = await import('../lib/users');
       if (pendingPhone.dbUser) {
         await updateUserPhone(pendingPhone.dbUser.id, phone);
-        const status = pendingPhone.dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+        const status: User['status'] = 'APPROVED';
         onLogin({
           id: pendingPhone.fbUser.uid,
           name: pendingPhone.dbUser.name,
@@ -176,16 +175,22 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           role: 'PARTNER',
           status,
         }, { rememberMe });
-        if (status === 'PENDING_APPROVAL') navigate('/aguardando');
-        else navigate('/dashboard');
+        navigate('/dashboard');
       } else {
-        await createPartnerRequestFromGoogle({
+        const created = await createPartnerRequestFromGoogle({
           name: pendingPhone.fbUser.displayName ?? pendingPhone.fbUser.email ?? 'Usuário',
           email: pendingPhone.fbUser.email ?? '',
           phone,
         });
-        window.location.href = '/#/aguardando';
-        return;
+        const status: User['status'] = 'APPROVED';
+        onLogin({
+          id: pendingPhone.fbUser.uid,
+          name: created.name,
+          email: created.email,
+          role: 'PARTNER',
+          status,
+        }, { rememberMe });
+        navigate('/dashboard');
       }
       setPendingPhone(null);
       setGoogleUserPendingPhone(null);
@@ -268,7 +273,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         return;
       }
 
-      const status = dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+      const status: User['status'] = 'APPROVED';
       const appUser: User = {
         id: fbUser.uid,
         name: dbUser.name,
@@ -277,8 +282,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         status,
       };
       onLogin(appUser, { rememberMe });
-      if (status === 'PENDING_APPROVAL') navigate('/aguardando');
-      else navigate('/dashboard');
+      navigate('/dashboard');
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
       const code = error.code ?? '';
@@ -317,7 +321,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       await createUserWithEmailAndPassword(auth, email, password);
       await createPartnerRequest({ companyName, name, email, phone });
       setFormData((prev) => ({ ...prev, companyName, name, email, phone }));
-      setStep(2);
+      // Volta para a aba de login após cadastro
+      if (loginEmailRef.current) {
+        loginEmailRef.current.value = email;
+      }
+      setMode('login');
+      setStep(1);
+      setError('Cadastro criado com sucesso! Agora você já pode entrar com seu e-mail e senha.');
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
       const code = error.code ?? '';
@@ -696,7 +706,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
           </p>
           <button type="submit" disabled={loading} className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed">
-            {loading ? 'Enviando...' : 'Solicitar Acesso'} <ShieldCheck size={18} />
+            {loading ? 'Enviando...' : 'Se cadastrar'} <ShieldCheck size={18} />
           </button>
         </form>
       )}
