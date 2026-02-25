@@ -4,7 +4,16 @@ import {
   Mail, Lock, ChevronRight, Chrome, ArrowLeft, MessageSquare,
   ShieldCheck, Clock, CheckCircle2, LogIn, UserPlus
 } from 'lucide-react';
-import { signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { User } from '../types';
 import { createPartnerRequest, createPartnerRequestFromGoogle, getUserByEmail } from '../lib/users';
@@ -200,10 +209,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       await sendPasswordResetEmail(auth, emailToUse);
       setForgotSuccess(true);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao enviar e-mail';
-      if (msg.includes('user-not-found')) {
+      const error = err as { code?: string; message?: string };
+      const code = error.code ?? '';
+      if (code === 'auth/user-not-found') {
         setForgotError('Não encontramos uma conta com este e-mail. Verifique ou cadastre-se.');
-      } else if (msg.includes('invalid-email')) {
+      } else if (code === 'auth/invalid-email') {
         setForgotError('E-mail inválido. Verifique e tente novamente.');
       } else {
         setForgotError('Não foi possível enviar o link. Tente novamente em alguns minutos.');
@@ -217,25 +227,72 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     e.preventDefault();
     const emailVal = loginEmailRef.current?.value?.trim() ?? '';
     const passwordVal = loginPasswordRef.current?.value ?? '';
-    if (!emailVal) return;
-    if (emailVal.includes('admin')) {
-      onLogin({
-        id: 'adm_1',
-        name: 'Carlos Admin',
-        email: emailVal,
-        role: 'ADMIN',
-        status: 'APPROVED',
-      }, { rememberMe });
-      navigate('/painel');
-    } else {
-      onLogin({
-        id: 'usr_1',
-        name: 'João Parceiro',
-        email: emailVal,
+    if (!emailVal || !passwordVal) {
+      setError('Informe e-mail e senha.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      const cred = await signInWithEmailAndPassword(auth, emailVal, passwordVal);
+      const fbUser = cred.user;
+      const email = fbUser.email ?? emailVal;
+      const name = fbUser.displayName ?? emailVal;
+
+      const isAdmin = email.toLowerCase().includes('admin');
+      if (isAdmin) {
+        const appUser: User = {
+          id: fbUser.uid,
+          name,
+          email,
+          role: 'ADMIN',
+          status: 'APPROVED',
+        };
+        onLogin(appUser, { rememberMe });
+        navigate('/painel');
+        return;
+      }
+
+      const dbUser = await getUserByEmail(email);
+      if (!dbUser) {
+        setError('Seu cadastro de parceiro ainda não foi encontrado. Conclua o cadastro ou fale com o suporte.');
+        return;
+      }
+      if (dbUser.status === 'REJECTED') {
+        setError('Seu cadastro foi rejeitado. Entre em contato com o suporte.');
+        return;
+      }
+      if (dbUser.status === 'BLOCKED') {
+        setError('Sua conta está bloqueada. Entre em contato com o suporte.');
+        return;
+      }
+
+      const status = dbUser.status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'APPROVED';
+      const appUser: User = {
+        id: fbUser.uid,
+        name: dbUser.name,
+        email: dbUser.email,
         role: 'PARTNER',
-        status: 'APPROVED',
-      }, { rememberMe });
-      navigate('/dashboard');
+        status,
+      };
+      onLogin(appUser, { rememberMe });
+      if (status === 'PENDING_APPROVAL') navigate('/aguardando');
+      else navigate('/dashboard');
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
+      const code = error.code ?? '';
+      if (code === 'auth/user-not-found') {
+        setError('Não encontramos uma conta com este e-mail. Verifique ou cadastre-se.');
+      } else if (code === 'auth/wrong-password') {
+        setError('Senha incorreta. Verifique e tente novamente.');
+      } else if (code === 'auth/too-many-requests') {
+        setError('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.');
+      } else {
+        setError('Não foi possível entrar. Tente novamente em alguns instantes.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -245,15 +302,34 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const name = registerNameRef.current?.value?.trim() ?? '';
     const email = registerEmailRef.current?.value?.trim() ?? '';
     const phone = registerPhoneRef.current?.value?.trim() ?? '';
-    if (!name || !email || !phone) return;
+    const password = registerPasswordRef.current?.value ?? '';
+    if (!name || !email || !phone || !password) {
+      setError('Preencha todos os campos obrigatórios.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
+      await createUserWithEmailAndPassword(auth, email, password);
       await createPartnerRequest({ companyName, name, email, phone });
       setFormData((prev) => ({ ...prev, companyName, name, email, phone }));
       setStep(2);
-    } catch {
-      setError('Erro ao enviar cadastro. Tente novamente.');
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
+      const code = error.code ?? '';
+      if (code === 'auth/email-already-in-use') {
+        setError('Este e-mail já está em uso. Tente entrar ou redefinir a senha.');
+      } else if (code === 'auth/invalid-email') {
+        setError('E-mail inválido. Verifique e tente novamente.');
+      } else if (code === 'auth/weak-password') {
+        setError('Sua senha é muito fraca. Use pelo menos 6 caracteres.');
+      } else {
+        setError('Erro ao enviar cadastro. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
