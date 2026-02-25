@@ -720,7 +720,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             Indicações somente para o mês vigente — após o mês, uma nova indicação deve ser enviada.
           </p>
           <button type="submit" disabled={loading} className="w-full bg-[#00B050] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600 transition-all shadow-xl shadow-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed">
-            {loading ? 'Enviando...' : 'Se cadastrar'} <ShieldCheck size={18} />
+            {loading ? 'Enviando...' : 'Cadastrar'} <ShieldCheck size={18} />
           </button>
         </form>
       )}
